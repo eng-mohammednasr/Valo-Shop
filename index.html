@@ -429,6 +429,85 @@
     font-weight:900;
   }
 
+  #valo-shop-page .old-versions{
+    margin-top:40px;
+  }
+  #valo-shop-page .old-versions-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  #valo-shop-page .old-versions-head h3{
+    font-size:18px;
+    font-weight:800;
+    color:var(--text);
+  }
+  #valo-shop-page .old-versions-toggle{
+    all:unset;
+    cursor:pointer;
+    color:var(--ice);
+    font-size:14px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  #valo-shop-page .old-versions-toggle .chevron{
+    font-size:18px;
+    transition: transform .3s ease;
+  }
+  #valo-shop-page .old-versions.open .old-versions-toggle .chevron{
+    transform: rotate(180deg);
+  }
+  #valo-shop-page .old-versions-list{
+    max-height:0;
+    overflow:hidden;
+    transition: max-height .4s ease;
+    margin-top:0;
+  }
+  #valo-shop-page .old-versions.open .old-versions-list{
+    max-height:900px;
+    margin-top:18px;
+  }
+  #valo-shop-page .old-version-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    padding:14px 18px;
+    margin-bottom:10px;
+    font-size:14px;
+  }
+  #valo-shop-page .old-version-row .ver-main{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  #valo-shop-page .old-version-row .ver-tag{
+    font-weight:800;
+    color:var(--text);
+  }
+  #valo-shop-page .old-version-row .ver-meta{
+    color:var(--muted-2);
+    font-size:12.5px;
+  }
+  #valo-shop-page .old-version-row a{
+    color:var(--ice);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  #valo-shop-page .old-version-row a:hover{ color:var(--red); }
+  #valo-shop-page .old-versions-empty{
+    color:var(--muted-2);
+    font-size:13.5px;
+  }
+
   #valo-shop-page .about-grid{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -733,7 +812,7 @@
         <div class="download-cta">
           <div>
             <h3>جاهز تحمّل التطبيق؟</h3>
-            <p>آخر إصدار متاح دلوقتي للأندرويد</p>
+            <p>آخر إصدار متاح دلوقتي للأندرويد · حجم الملف: <b id="valo-file-size" style="color:var(--text);">…</b></p>
           </div>
           <a href="https://github.com/eng-mohammednasr/Valo-Shop/releases/latest/download/valoshop.apk" id="valo-download-btn" class="btn btn-primary">تحميل APK</a>
         </div>
@@ -741,6 +820,19 @@
         <div class="counters">
           <div class="counter-pill">📥 عدد مرات التحميل: <b id="valo-download-count">…</b></div>
           <div class="counter-pill">👀 زيارات الموقع: <b id="valo-visit-count">…</b></div>
+        </div>
+
+        <div class="old-versions" id="valo-old-versions-wrap">
+          <div class="old-versions-head">
+            <h3>إصدارات سابقة</h3>
+            <button type="button" class="old-versions-toggle" id="valo-old-versions-toggle" aria-expanded="false">
+              <span id="valo-old-versions-toggle-label">عرض الإصدارات القديمة</span>
+              <span class="chevron">⌄</span>
+            </button>
+          </div>
+          <div class="old-versions-list" id="valo-old-versions-list">
+            <p class="old-versions-empty" id="valo-old-versions-empty">بنجيب الإصدارات القديمة…</p>
+          </div>
         </div>
       </div>
     </section>
@@ -896,6 +988,19 @@
     });
   });
 
+  var oldVersionsWrap = document.getElementById('valo-old-versions-wrap');
+  var oldVersionsToggle = document.getElementById('valo-old-versions-toggle');
+  var oldVersionsToggleLabel = document.getElementById('valo-old-versions-toggle-label');
+  if(oldVersionsToggle && oldVersionsWrap){
+    oldVersionsToggle.addEventListener('click', function(){
+      var isOpen = oldVersionsWrap.classList.toggle('open');
+      oldVersionsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if(oldVersionsToggleLabel){
+        oldVersionsToggleLabel.textContent = isOpen ? 'إخفاء الإصدارات القديمة' : 'عرض الإصدارات القديمة';
+      }
+    });
+  }
+
   function initNetworkWidgets(){
     var VISITS_KEY = 'valo-shop-mn-2026-app-visits';
     var COUNTAPI_BASE = 'https://countapi.mileshilliard.com/api/v1';
@@ -918,6 +1023,22 @@
     var GH_REPO = 'Valo-Shop';
     var GH_ASSET_NAME = 'valoshop.apk';
     var downloadEl = document.getElementById('valo-download-count');
+    var fileSizeEl = document.getElementById('valo-file-size');
+    var oldVersionsList = document.getElementById('valo-old-versions-list');
+
+    function formatBytes(bytes){
+      if(!bytes && bytes !== 0){ return '—'; }
+      var mb = bytes / (1024 * 1024);
+      return mb.toFixed(1).replace(/\.0$/, '') + ' MB';
+    }
+
+    function formatDate(iso){
+      try{
+        return new Date(iso).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+      }catch(e){
+        return '';
+      }
+    }
 
     // بيجيب كل صفحات الـ Releases (GitHub بيرجع لغاية 100 في الصفحة، فلو فيه أكتر بنتبع رابط "next" من الـ Link header)
     function fetchAllReleases(url, acc){
@@ -942,8 +1063,10 @@
     }
 
     // بنجمع عدد تحميلات ملف "valoshop.apk" من كل الإصدارات مع بعض
-    // (مش بس آخر إصدار) عشان الرقم يفضل تراكمي ومايرجعش صفر مع كل ريليس جديد
-    function refreshGithubDownloadCount(){
+    // (مش بس آخر إصدار) عشان الرقم يفضل تراكمي ومايرجعش صفر مع كل ريليس جديد.
+    // نفس الطلب ده بنستخدمه كمان عشان نجيب حجم آخر نسخة، ونبني قايمة
+    // الإصدارات القديمة — بدل ما نعمل طلب منفصل لكل حاجة.
+    function refreshFromReleases(){
       fetchAllReleases('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/releases?per_page=100')
         .then(function(releases){
           var total = 0;
@@ -957,18 +1080,75 @@
           if(downloadEl){
             downloadEl.textContent = total.toLocaleString('ar-EG');
           }
+
+          // GitHub بيرجع الإصدارات الأحدث الأول، فأول عنصر هو آخر نسخة
+          var latest = releases.length > 0 ? releases[0] : null;
+          var latestAsset = latest ? (latest.assets || []).filter(function(a){ return a.name === GH_ASSET_NAME; })[0] : null;
+          if(fileSizeEl){
+            fileSizeEl.textContent = latestAsset ? formatBytes(latestAsset.size) : '—';
+          }
+
+          if(oldVersionsList){
+            oldVersionsList.innerHTML = '';
+            var olderReleases = releases.slice(1);
+            if(olderReleases.length === 0){
+              var emptyMsg = document.createElement('p');
+              emptyMsg.className = 'old-versions-empty';
+              emptyMsg.textContent = 'لسه مفيش إصدارات قديمة متاحة.';
+              oldVersionsList.appendChild(emptyMsg);
+            } else {
+              olderReleases.forEach(function(release){
+                var asset = (release.assets || []).filter(function(a){ return a.name === GH_ASSET_NAME; })[0];
+                if(!asset){ return; }
+                var row = document.createElement('div');
+                row.className = 'old-version-row';
+
+                var mainDiv = document.createElement('div');
+                mainDiv.className = 'ver-main';
+
+                var tagSpan = document.createElement('span');
+                tagSpan.className = 'ver-tag';
+                tagSpan.textContent = release.tag_name || release.name || '—';
+                mainDiv.appendChild(tagSpan);
+
+                var metaSpan = document.createElement('span');
+                metaSpan.className = 'ver-meta';
+                metaSpan.textContent = formatDate(release.published_at) + ' · ' + formatBytes(asset.size);
+                mainDiv.appendChild(metaSpan);
+
+                row.appendChild(mainDiv);
+
+                var link = document.createElement('a');
+                link.href = asset.browser_download_url;
+                link.textContent = 'تحميل';
+                row.appendChild(link);
+
+                oldVersionsList.appendChild(row);
+              });
+              if(oldVersionsList.children.length === 0){
+                var emptyMsg2 = document.createElement('p');
+                emptyMsg2.className = 'old-versions-empty';
+                emptyMsg2.textContent = 'لسه مفيش إصدارات قديمة متاحة.';
+                oldVersionsList.appendChild(emptyMsg2);
+              }
+            }
+          }
         })
         .catch(function(){
           if(downloadEl){ downloadEl.textContent = '—'; }
+          if(fileSizeEl){ fileSizeEl.textContent = '—'; }
+          if(oldVersionsList){
+            oldVersionsList.innerHTML = '<p class="old-versions-empty">مقدرناش نجيب الإصدارات القديمة دلوقتي.</p>';
+          }
         });
     }
 
-    refreshGithubDownloadCount();
+    refreshFromReleases();
 
     var downloadBtn = document.getElementById('valo-download-btn');
     if(downloadBtn){
       downloadBtn.addEventListener('click', function(){
-        setTimeout(refreshGithubDownloadCount, 4000);
+        setTimeout(refreshFromReleases, 4000);
       });
     }
   }
@@ -982,4 +1162,3 @@
 </script>
 </body>
 </html>
-
