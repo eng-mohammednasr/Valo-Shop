@@ -1043,7 +1043,7 @@
     // بيجيب كل صفحات الـ Releases (GitHub بيرجع لغاية 100 في الصفحة، فلو فيه أكتر بنتبع رابط "next" من الـ Link header)
     function fetchAllReleases(url, acc){
       acc = acc || [];
-      return fetch(url).then(function(r){
+      return fetch(url, { cache: 'no-store' }).then(function(r){
         var linkHeader = r.headers.get('Link');
         return r.json().then(function(data){
           acc = acc.concat(Array.isArray(data) ? data : []);
@@ -1067,7 +1067,10 @@
     // نفس الطلب ده بنستخدمه كمان عشان نجيب حجم آخر نسخة، ونبني قايمة
     // الإصدارات القديمة — بدل ما نعمل طلب منفصل لكل حاجة.
     function refreshFromReleases(){
-      fetchAllReleases('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/releases?per_page=100')
+      // "&_=" + Date.now() busts any proxy/browser cache keyed on the URL
+      // alone — without it, a stale cached response here is exactly what
+      // shows the file size and version list stuck on an old release.
+      fetchAllReleases('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/releases?per_page=100&_=' + Date.now())
         .then(function(releases){
           var total = 0;
           releases.forEach(function(release){
