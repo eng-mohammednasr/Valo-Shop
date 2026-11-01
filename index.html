@@ -954,7 +954,11 @@
   var root = document.getElementById('valo-shop-page');
   if(!root) return;
 
-  var LANG_KEY = 'valo-shop-lang';
+  // Only a language the visitor picked with the AR/EN switch is saved here.
+  // (A different key from the first bilingual version, which saved whatever
+  // language was showing on every load — that would have locked everyone
+  // who'd already visited into Arabic and hidden auto-detection.)
+  var LANG_KEY = 'valo-shop-lang-choice';
   var STRINGS = {
     ar: {
       title: 'Valo Shop — تابع شوب Valorant من موبايلك',
@@ -982,15 +986,34 @@
     }
   };
 
-  var currentLang = 'ar';
+  // Walks the device/browser's language preference list in order and takes
+  // the first one that is Arabic or English (so a phone set to French then
+  // Arabic gets Arabic). If neither appears, English is the fallback.
+  function detectDeviceLang(){
+    var prefs = (navigator.languages && navigator.languages.length)
+      ? navigator.languages
+      : [navigator.language || navigator.userLanguage || ''];
+    for(var i = 0; i < prefs.length; i++){
+      var code = String(prefs[i] || '').toLowerCase();
+      if(code.indexOf('ar') === 0){ return 'ar'; }
+      if(code.indexOf('en') === 0){ return 'en'; }
+    }
+    return 'en';
+  }
+
+  // A manual choice always wins; auto-detection only applies when the
+  // visitor hasn't picked one.
+  var currentLang = detectDeviceLang();
   try{
     var saved = localStorage.getItem(LANG_KEY);
     if(saved === 'ar' || saved === 'en'){ currentLang = saved; }
   }catch(e){}
 
-  function applyLang(lang){
+  function applyLang(lang, persist){
     currentLang = lang;
-    try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
+    if(persist){
+      try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
+    }
 
     var dir = lang === 'ar' ? 'rtl' : 'ltr';
     root.setAttribute('dir', dir);
@@ -1033,10 +1056,10 @@
 
   var langAr = document.getElementById('valo-lang-ar');
   var langEn = document.getElementById('valo-lang-en');
-  if(langAr){ langAr.addEventListener('click', function(){ applyLang('ar'); }); }
-  if(langEn){ langEn.addEventListener('click', function(){ applyLang('en'); }); }
+  if(langAr){ langAr.addEventListener('click', function(){ applyLang('ar', true); }); }
+  if(langEn){ langEn.addEventListener('click', function(){ applyLang('en', true); }); }
 
-  applyLang(currentLang);
+  applyLang(currentLang, false);
 
   var y = document.getElementById('valo-shop-year');
   if(y){ y.textContent = new Date().getFullYear(); }
