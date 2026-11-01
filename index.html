@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valo Shop — تابع شوب Valorant من موبايلك</title>
-<meta name="description" content="Valo Shop بيوريك الشوب اليومي، الباندلات، النايت ماركت، والرانك بتاعك من غير ما تفتح اللعبة أصلًا.">
+<title id="valo-title">Valo Shop — تابع شوب Valorant من موبايلك</title>
+<meta id="valo-desc" name="description" content="Valo Shop بيوريك الشوب اليومي، الباندلات، النايت ماركت، والرانك بتاعك من غير ما تفتح اللعبة أصلًا.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -34,6 +34,11 @@
     overflow-x:hidden;
   }
 
+  #valo-shop-page[dir="ltr"]{ font-family:'Inter', sans-serif; }
+  #valo-shop-page[dir="ltr"] .hero h1,
+  #valo-shop-page[dir="ltr"] .step .num,
+  #valo-shop-page[dir="ltr"] .faq-toggle h3{ font-family:'Inter', sans-serif; }
+
   #valo-shop-page *{ box-sizing:border-box; }
   #valo-shop-page a{ color:inherit; text-decoration:none; }
   #valo-shop-page ul{ list-style:none; margin:0; padding:0; }
@@ -42,6 +47,33 @@
     max-width:1040px;
     margin:0 auto;
     padding:0 24px;
+  }
+
+  #valo-shop-page .lang-switch{
+    position:fixed;
+    top:18px;
+    inset-inline-end:18px;
+    z-index:950;
+    display:flex;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:4px;
+    gap:2px;
+  }
+  #valo-shop-page .lang-switch button{
+    all:unset;
+    cursor:pointer;
+    padding:7px 14px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:800;
+    color:var(--muted);
+    transition: background .25s ease, color .25s ease;
+  }
+  #valo-shop-page .lang-switch button.active{
+    background:var(--red);
+    color:#0A0C0F;
   }
 
   #valo-shop-page .hero{
@@ -142,13 +174,16 @@
     align-items:center;
     gap:10px;
     padding:16px 30px;
-    font-family:'Cairo', sans-serif;
+    font-family:inherit;
     font-weight:700;
     font-size:16px;
     border:none;
     cursor:pointer;
     clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
     transition: transform .2s ease, box-shadow .2s ease;
+  }
+  #valo-shop-page[dir="ltr"] .btn{
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   }
   #valo-shop-page .btn-primary{
     background:var(--red);
@@ -350,14 +385,15 @@
   #valo-shop-page .feature ul li, #valo-shop-page .faq-body li{
     color:var(--muted);
     font-size:15.5px;
-    padding-right:18px;
+    padding-inline-start:18px;
     position:relative;
     margin-bottom:8px;
   }
   #valo-shop-page .feature ul li::before, #valo-shop-page .faq-body li::before{
     content:"";
     position:absolute;
-    right:0; top:11px;
+    inset-inline-start:0;
+    top:11px;
     width:6px; height:6px;
     background:var(--red);
   }
@@ -379,7 +415,6 @@
     position:relative;
   }
   #valo-shop-page .step .num{
-    font-family:'Cairo', sans-serif;
     font-weight:900;
     font-size:34px;
     color:var(--red-dim);
@@ -561,7 +596,7 @@
   #valo-shop-page .faq-toggle h3{
     font-size:19px;
     font-weight:800;
-    text-align:right;
+    text-align:start;
     transition: color .25s ease;
   }
   #valo-shop-page .faq-item:hover .faq-toggle h3{ color:var(--red); }
@@ -578,7 +613,7 @@
     max-height:0;
     overflow:hidden;
     opacity:0;
-    padding-right:80px;
+    padding-inline-start:80px;
     transition: max-height .5s cubic-bezier(.22,.61,.36,1), opacity .35s ease, padding-bottom .5s ease;
   }
   #valo-shop-page .faq-item.open .faq-body{
@@ -651,10 +686,12 @@
     transition: transform .1s linear;
     will-change: transform;
   }
+  #valo-shop-page[dir="ltr"] #valo-shop-progress{ transform-origin:left; }
 
   #valo-shop-totop{
     position:fixed;
-    left:22px; bottom:22px;
+    inset-inline-start:22px;
+    bottom:22px;
     width:50px; height:50px;
     background:var(--surface-2);
     border:1px solid var(--line);
@@ -683,21 +720,26 @@
 
   <div class="progress-bar" id="valo-shop-progress"></div>
 
+  <div class="lang-switch" role="group" aria-label="Language / اللغة">
+    <button type="button" id="valo-lang-ar" data-lang="ar">AR</button>
+    <button type="button" id="valo-lang-en" data-lang="en">EN</button>
+  </div>
+
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="valo-hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="eyebrow reveal">تطبيق أندرويد غير رسمي</span>
-        <h1 class="reveal">تابع شوب <span>Valorant</span><br>من موبايلك، لحظة بلحظة</h1>
-        <p class="lead reveal">Valo Shop بيوريك الشوب اليومي، الباندلات، النايت ماركت، والرانك بتاعك من غير ما تفتح اللعبة أصلًا. سريع، بسيط، وبواجهة قريبة من شكل اللعبة نفسها.</p>
+        <span class="eyebrow reveal" data-ar="تطبيق أندرويد غير رسمي" data-en="Unofficial Android app">تطبيق أندرويد غير رسمي</span>
+        <h1 class="reveal" data-ar="تابع شوب &lt;span&gt;Valorant&lt;/span&gt;&lt;br&gt;من موبايلك، لحظة بلحظة" data-en="Track your &lt;span&gt;Valorant&lt;/span&gt; store&lt;br&gt;right from your phone">تابع شوب <span>Valorant</span><br>من موبايلك، لحظة بلحظة</h1>
+        <p class="lead reveal" data-ar="Valo Shop بيوريك الشوب اليومي، الباندلات، النايت ماركت، والرانك بتاعك من غير ما تفتح اللعبة أصلًا. سريع، بسيط، وبواجهة قريبة من شكل اللعبة نفسها." data-en="Valo Shop shows you today's store, bundles, the Night Market, and your rank — without ever opening the game. Fast, simple, and styled close to the game itself.">Valo Shop بيوريك الشوب اليومي، الباندلات، النايت ماركت، والرانك بتاعك من غير ما تفتح اللعبة أصلًا. سريع، بسيط، وبواجهة قريبة من شكل اللعبة نفسها.</p>
         <div class="cta-row reveal">
-          <a href="#download" class="btn btn-primary">حمّل Valo Shop دلوقتي</a>
-          <a href="#features" class="btn btn-ghost">شوف المميزات</a>
+          <a href="#download" class="btn btn-primary" data-ar="حمّل Valo Shop دلوقتي" data-en="Download Valo Shop now">حمّل Valo Shop دلوقتي</a>
+          <a href="#features" class="btn btn-ghost" data-ar="شوف المميزات" data-en="See features">شوف المميزات</a>
         </div>
       </div>
       <div class="hero-visual">
         <div class="phone-frame">
-          <img src="images/home.png" alt="الشاشة الرئيسية لتطبيق Valo Shop" width="230" height="511" loading="eager" fetchpriority="high" decoding="async">
+          <img src="images/home.png" data-alt-ar="الشاشة الرئيسية لتطبيق Valo Shop" data-alt-en="Valo Shop app home screen" alt="الشاشة الرئيسية لتطبيق Valo Shop" width="230" height="511" loading="eager" fetchpriority="high" decoding="async">
         </div>
       </div>
     </div>
@@ -707,7 +749,7 @@
   <div class="disclaimer">
     <div class="wrap disclaimer-inner">
       <div class="disclaimer-mark">i</div>
-      <p><b>تنويه:</b> Valo Shop تطبيق غير رسمي وغير تابع لشركة Riot Games. الهدف منه عرض بيانات الشوب فقط لتسهيل المتابعة، وأي أسماء أو صور خاصة بلعبة Valorant مملوكة لأصحابها.</p>
+      <p data-ar="&lt;b&gt;تنويه:&lt;/b&gt; Valo Shop تطبيق غير رسمي وغير تابع لشركة Riot Games. الهدف منه عرض بيانات الشوب فقط لتسهيل المتابعة، وأي أسماء أو صور خاصة بلعبة Valorant مملوكة لأصحابها." data-en="&lt;b&gt;Disclaimer:&lt;/b&gt; Valo Shop is an unofficial app, not affiliated with Riot Games. It only displays store data to make following it easier — any Valorant names or images belong to their respective owners."><b>تنويه:</b> Valo Shop تطبيق غير رسمي وغير تابع لشركة Riot Games. الهدف منه عرض بيانات الشوب فقط لتسهيل المتابعة، وأي أسماء أو صور خاصة بلعبة Valorant مملوكة لأصحابها.</p>
     </div>
   </div>
 
@@ -715,26 +757,26 @@
   <section class="gallery" id="gallery">
     <div class="wrap">
       <div class="section-head">
-        <span class="tag">لقطات من التطبيق</span>
-        <h2>شكل التطبيق من جوه</h2>
-        <p>واجهة بسيطة ومرتبة، مصممة عشان تشوف كل حاجة في ثانية من غير تعقيد.</p>
+        <span class="tag" data-ar="لقطات من التطبيق" data-en="App screenshots">لقطات من التطبيق</span>
+        <h2 data-ar="شكل التطبيق من جوه" data-en="What the app looks like">شكل التطبيق من جوه</h2>
+        <p data-ar="واجهة بسيطة ومرتبة، مصممة عشان تشوف كل حاجة في ثانية من غير تعقيد." data-en="A clean, simple interface designed so you can see everything in a second, no clutter.">واجهة بسيطة ومرتبة، مصممة عشان تشوف كل حاجة في ثانية من غير تعقيد.</p>
       </div>
       <div class="gallery-row">
         <div class="shot reveal">
-          <div class="frame"><img src="images/shop.png" alt="شاشة الشوب اليومي" width="300" height="667" loading="lazy" decoding="async"></div>
-          <div class="cap">الشوب اليومي<span>أسلحة وسكنات النهاردة</span></div>
+          <div class="frame"><img src="images/shop.png" data-alt-ar="شاشة الشوب اليومي" data-alt-en="Daily shop screen" alt="شاشة الشوب اليومي" width="300" height="667" loading="lazy" decoding="async"></div>
+          <div class="cap" data-ar="الشوب اليومي&lt;span&gt;أسلحة وسكنات النهاردة&lt;/span&gt;" data-en="Daily Shop&lt;span&gt;Today's weapon skins&lt;/span&gt;">الشوب اليومي<span>أسلحة وسكنات النهاردة</span></div>
         </div>
         <div class="shot reveal">
-          <div class="frame"><img src="images/profile.gif" alt="شاشة الرانك والرصيد" width="300" height="667" loading="lazy" decoding="async"></div>
-          <div class="cap">الرانك والرصيد<span>تتبع تقدمك ورصيدك</span></div>
+          <div class="frame"><img src="images/profile.gif" data-alt-ar="شاشة الرانك والرصيد" data-alt-en="Rank and balance screen" alt="شاشة الرانك والرصيد" width="300" height="667" loading="lazy" decoding="async"></div>
+          <div class="cap" data-ar="الرانك والرصيد&lt;span&gt;تتبع تقدمك ورصيدك&lt;/span&gt;" data-en="Rank &amp; Balance&lt;span&gt;Track your progress and balance&lt;/span&gt;">الرانك والرصيد<span>تتبع تقدمك ورصيدك</span></div>
         </div>
         <div class="shot reveal">
-          <div class="frame"><img src="images/matches.png" alt="شاشة سجل الماتشات" width="300" height="667" loading="lazy" decoding="async"></div>
-          <div class="cap">سجل الماتشات<span>نتايج آخر جولاتك بالتفصيل</span></div>
+          <div class="frame"><img src="images/matches.png" data-alt-ar="شاشة سجل الماتشات" data-alt-en="Match history screen" alt="شاشة سجل الماتشات" width="300" height="667" loading="lazy" decoding="async"></div>
+          <div class="cap" data-ar="سجل الماتشات&lt;span&gt;نتايج آخر جولاتك بالتفصيل&lt;/span&gt;" data-en="Match History&lt;span&gt;Detailed results of your recent games&lt;/span&gt;">سجل الماتشات<span>نتايج آخر جولاتك بالتفصيل</span></div>
         </div>
         <div class="shot reveal">
-          <div class="frame"><img src="images/wishlist.png" alt="شاشة المفضلة" width="300" height="667" loading="lazy" decoding="async"></div>
-          <div class="cap">قائمة المفضلة<span>أهم الأسلحة اللي عايزها</span></div>
+          <div class="frame"><img src="images/wishlist.png" data-alt-ar="شاشة المفضلة" data-alt-en="Wishlist screen" alt="شاشة المفضلة" width="300" height="667" loading="lazy" decoding="async"></div>
+          <div class="cap" data-ar="قائمة المفضلة&lt;span&gt;أهم الأسلحة اللي عايزها&lt;/span&gt;" data-en="Wishlist&lt;span&gt;The skins you care about most&lt;/span&gt;">قائمة المفضلة<span>أهم الأسلحة اللي عايزها</span></div>
         </div>
       </div>
     </div>
@@ -744,37 +786,37 @@
   <section id="features">
     <div class="wrap">
       <div class="section-head">
-        <span class="tag">المميزات</span>
-        <h2>ليه تستخدم Valo Shop؟</h2>
-        <p>كل اللي محتاجه عشان تفوت الشوب اليومي مفيش حاجة تفوتك.</p>
+        <span class="tag" data-ar="المميزات" data-en="Features">المميزات</span>
+        <h2 data-ar="ليه تستخدم Valo Shop؟" data-en="Why use Valo Shop?">ليه تستخدم Valo Shop؟</h2>
+        <p data-ar="كل اللي محتاجه عشان تفوت الشوب اليومي مفيش حاجة تفوتك." data-en="Everything you need so you never miss today's shop.">كل اللي محتاجه عشان تفوت الشوب اليومي مفيش حاجة تفوتك.</p>
       </div>
       <div class="feature-list">
         <div class="feature reveal">
           <div class="icon">🛒</div>
           <div>
-            <h3>الشوب اليومي لحظة بلحظة</h3>
+            <h3 data-ar="الشوب اليومي لحظة بلحظة" data-en="Today's shop, in real time">الشوب اليومي لحظة بلحظة</h3>
             <ul>
-              <li>شوف السكنات المتاحة النهاردة من غير ما تفتح اللعبة</li>
-              <li>تنبيه لما يظهر سكن مفضل عندك</li>
+              <li data-ar="شوف السكنات المتاحة النهاردة من غير ما تفتح اللعبة" data-en="See today's available skins without opening the game">شوف السكنات المتاحة النهاردة من غير ما تفتح اللعبة</li>
+              <li data-ar="تنبيه لما يظهر سكن مفضل عندك" data-en="Get alerted the moment a skin on your wishlist shows up">تنبيه لما يظهر سكن مفضل عندك</li>
             </ul>
           </div>
         </div>
         <div class="feature reveal">
           <div class="icon">🎁</div>
           <div>
-            <h3>الباندلات والنايت ماركت</h3>
+            <h3 data-ar="الباندلات والنايت ماركت" data-en="Bundles &amp; Night Market">الباندلات والنايت ماركت</h3>
             <ul>
-              <li>متابعة العروض والخصومات أول بأول</li>
-              <li>تفاصيل الأسعار قبل ما تشتري</li>
+              <li data-ar="متابعة العروض والخصومات أول بأول" data-en="Follow offers and discounts as they happen">متابعة العروض والخصومات أول بأول</li>
+              <li data-ar="تفاصيل الأسعار قبل ما تشتري" data-en="See full pricing details before you buy">تفاصيل الأسعار قبل ما تشتري</li>
             </ul>
           </div>
         </div>
         <div class="feature reveal">
           <div class="icon">🏆</div>
           <div>
-            <h3>تتبع الرانك</h3>
+            <h3 data-ar="تتبع الرانك" data-en="Rank tracking">تتبع الرانك</h3>
             <ul>
-              <li>شوف رتبتك وتقدمك بسهولة</li>
+              <li data-ar="شوف رتبتك وتقدمك بسهولة" data-en="See your rank and progress at a glance">شوف رتبتك وتقدمك بسهولة</li>
             </ul>
           </div>
         </div>
@@ -787,51 +829,51 @@
     <section id="download">
       <div class="wrap">
         <div class="section-head">
-          <span class="tag">التثبيت</span>
-          <h2>خطوات التحميل والتشغيل</h2>
+          <span class="tag" data-ar="التثبيت" data-en="Installation">التثبيت</span>
+          <h2 data-ar="خطوات التحميل والتشغيل" data-en="Download &amp; setup steps">خطوات التحميل والتشغيل</h2>
         </div>
         <div class="steps">
           <div class="step reveal">
             <div class="num">1</div>
-            <p>حمّل ملف الـ APK من الرابط تحت</p>
+            <p data-ar="حمّل ملف الـ APK من الرابط تحت" data-en="Download the APK file from the link below">حمّل ملف الـ APK من الرابط تحت</p>
           </div>
           <div class="step reveal">
             <div class="num">2</div>
-            <p>فعّل خيار "مصادر غير معروفة" من إعدادات الجهاز</p>
+            <p data-ar="فعّل خيار &quot;مصادر غير معروفة&quot; من إعدادات الجهاز" data-en='Enable "Unknown sources" in your device settings'>فعّل خيار "مصادر غير معروفة" من إعدادات الجهاز</p>
           </div>
           <div class="step reveal">
             <div class="num">3</div>
-            <p>ثبّت التطبيق وافتحه</p>
+            <p data-ar="ثبّت التطبيق وافتحه" data-en="Install the app and open it">ثبّت التطبيق وافتحه</p>
           </div>
           <div class="step reveal">
             <div class="num">4</div>
-            <p>سجّل حسابك وابدأ المتابعة</p>
+            <p data-ar="سجّل حسابك وابدأ المتابعة" data-en="Sign in with your account and start tracking">سجّل حسابك وابدأ المتابعة</p>
           </div>
         </div>
 
         <div class="download-cta">
           <div>
-            <h3>جاهز تحمّل التطبيق؟</h3>
-            <p>آخر إصدار متاح دلوقتي للأندرويد · حجم الملف: <b id="valo-file-size" style="color:var(--text);">…</b></p>
+            <h3 data-ar="جاهز تحمّل التطبيق؟" data-en="Ready to download?">جاهز تحمّل التطبيق؟</h3>
+            <p><span data-ar="آخر إصدار متاح دلوقتي للأندرويد · حجم الملف: " data-en="Latest version available now for Android · File size: ">آخر إصدار متاح دلوقتي للأندرويد · حجم الملف: </span><b id="valo-file-size" style="color:var(--text);">…</b></p>
           </div>
-          <a href="https://github.com/eng-mohammednasr/Valo-Shop/releases/latest/download/valoshop.apk" id="valo-download-btn" class="btn btn-primary">تحميل APK</a>
+          <a href="https://github.com/eng-mohammednasr/Valo-Shop/releases/latest/download/valoshop.apk" id="valo-download-btn" class="btn btn-primary" data-ar="تحميل APK" data-en="Download APK">تحميل APK</a>
         </div>
 
         <div class="counters">
-          <div class="counter-pill">📥 عدد مرات التحميل: <b id="valo-download-count">…</b></div>
-          <div class="counter-pill">👀 زيارات الموقع: <b id="valo-visit-count">…</b></div>
+          <div class="counter-pill"><span data-ar="📥 عدد مرات التحميل: " data-en="📥 Downloads: ">📥 عدد مرات التحميل: </span><b id="valo-download-count">…</b></div>
+          <div class="counter-pill"><span data-ar="👀 زيارات الموقع: " data-en="👀 Site visits: ">👀 زيارات الموقع: </span><b id="valo-visit-count">…</b></div>
         </div>
 
         <div class="old-versions" id="valo-old-versions-wrap">
           <div class="old-versions-head">
-            <h3>إصدارات سابقة</h3>
+            <h3 data-ar="إصدارات سابقة" data-en="Previous versions">إصدارات سابقة</h3>
             <button type="button" class="old-versions-toggle" id="valo-old-versions-toggle" aria-expanded="false">
-              <span id="valo-old-versions-toggle-label">عرض الإصدارات القديمة</span>
+              <span id="valo-old-versions-toggle-label" data-ar="عرض الإصدارات القديمة" data-en="Show previous versions">عرض الإصدارات القديمة</span>
               <span class="chevron">⌄</span>
             </button>
           </div>
           <div class="old-versions-list" id="valo-old-versions-list">
-            <p class="old-versions-empty" id="valo-old-versions-empty">بنجيب الإصدارات القديمة…</p>
+            <p class="old-versions-empty" id="valo-old-versions-empty" data-ar="بنجيب الإصدارات القديمة…" data-en="Fetching previous versions…">بنجيب الإصدارات القديمة…</p>
           </div>
         </div>
       </div>
@@ -842,15 +884,15 @@
   <section id="about">
     <div class="wrap about-grid">
       <div>
-        <span class="section-head tag" style="margin-bottom:14px;display:block;">عن التطبيق</span>
-        <p>Valo Shop اتعمل عشان يسهل على لاعبي Valorant متابعة الشوب اليومي والعروض من غير ما يحتاجوا يفتحوا اللعبة كل شوية. التطبيق مبني فوق مشروع مفتوح المصدر اسمه <a href="https://github.com/VShopApp/mobile" style="color:var(--ice);">VShop</a> (رخصة GPLv3)، وبيستخدم بيانات السكنات من <a href="https://valorant-api.com" style="color:var(--ice);">valorant-api.com</a>.</p>
-        <p>التطبيق مجاني بالكامل، بيقرأ جلسة تسجيل دخولك من سيرفرات Riot مباشرة وبتفضل على جهازك بس — مفيش سيرفر خاص بينا وبيانات حسابك متتخزنش عند حد.</p>
-        <p style="font-size:13px;color:var(--muted-2);">Valo Shop تطبيق غير رسمي وغير تابع لشركة Riot Games.</p>
+        <span class="section-head tag" style="margin-bottom:14px;display:block;" data-ar="عن التطبيق" data-en="About the app">عن التطبيق</span>
+        <p data-ar="Valo Shop اتعمل عشان يسهل على لاعبي Valorant متابعة الشوب اليومي والعروض من غير ما يحتاجوا يفتحوا اللعبة كل شوية. التطبيق مبني فوق مشروع مفتوح المصدر اسمه &lt;a href=&quot;https://github.com/VShopApp/mobile&quot; style=&quot;color:var(--ice);&quot;&gt;VShop&lt;/a&gt; (رخصة GPLv3)، وبيستخدم بيانات السكنات من &lt;a href=&quot;https://valorant-api.com&quot; style=&quot;color:var(--ice);&quot;&gt;valorant-api.com&lt;/a&gt;." data-en="Valo Shop was built to make it easier for Valorant players to follow the daily shop and offers without constantly opening the game. It's built on top of an open-source project called &lt;a href=&quot;https://github.com/VShopApp/mobile&quot; style=&quot;color:var(--ice);&quot;&gt;VShop&lt;/a&gt; (GPLv3 license), and uses skin data from &lt;a href=&quot;https://valorant-api.com&quot; style=&quot;color:var(--ice);&quot;&gt;valorant-api.com&lt;/a&gt;.">Valo Shop اتعمل عشان يسهل على لاعبي Valorant متابعة الشوب اليومي والعروض من غير ما يحتاجوا يفتحوا اللعبة كل شوية. التطبيق مبني فوق مشروع مفتوح المصدر اسمه <a href="https://github.com/VShopApp/mobile" style="color:var(--ice);">VShop</a> (رخصة GPLv3)، وبيستخدم بيانات السكنات من <a href="https://valorant-api.com" style="color:var(--ice);">valorant-api.com</a>.</p>
+        <p data-ar="التطبيق مجاني بالكامل، بيقرأ جلسة تسجيل دخولك من سيرفرات Riot مباشرة وبتفضل على جهازك بس — مفيش سيرفر خاص بينا وبيانات حسابك متتخزنش عند حد." data-en="The app is completely free. It reads your login session straight from Riot's own servers and keeps it only on your device — there's no backend of ours, and your account data isn't stored anywhere else.">التطبيق مجاني بالكامل، بيقرأ جلسة تسجيل دخولك من سيرفرات Riot مباشرة وبتفضل على جهازك بس — مفيش سيرفر خاص بينا وبيانات حسابك متتخزنش عند حد.</p>
+        <p style="font-size:13px;color:var(--muted-2);" data-ar="Valo Shop تطبيق غير رسمي وغير تابع لشركة Riot Games." data-en="Valo Shop is an unofficial app and is not affiliated with Riot Games.">Valo Shop تطبيق غير رسمي وغير تابع لشركة Riot Games.</p>
       </div>
       <div class="credit-card">
-        <div class="label">المطور</div>
+        <div class="label" data-ar="المطور" data-en="Developer">المطور</div>
         <div class="value">Eng/Mohammed Nasr</div>
-        <div class="label">تواصل</div>
+        <div class="label" data-ar="تواصل" data-en="Contact">تواصل</div>
         <div class="value"><a href="https://www.facebook.com/share/1YQLvj9e7P/" target="_blank" rel="noopener">Facebook</a></div>
       </div>
     </div>
@@ -860,38 +902,38 @@
   <section id="faq">
     <div class="wrap">
       <div class="section-head">
-        <span class="tag">أسئلة شائعة</span>
-        <h2>لسه محتاج تعرف حاجة؟</h2>
+        <span class="tag" data-ar="أسئلة شائعة" data-en="FAQ">أسئلة شائعة</span>
+        <h2 data-ar="لسه محتاج تعرف حاجة؟" data-en="Still have questions?">لسه محتاج تعرف حاجة؟</h2>
       </div>
       <div id="valo-faq-list">
         <div class="faq-item">
           <button class="faq-toggle" type="button" aria-expanded="false">
             <span class="icon">❓</span>
-            <h3>هل التطبيق آمن؟</h3>
+            <h3 data-ar="هل التطبيق آمن؟" data-en="Is the app safe?">هل التطبيق آمن؟</h3>
             <span class="chevron">+</span>
           </button>
           <div class="faq-body">
-            <ul><li>التطبيق مبيطلبش باسورد حسابك في Valorant، بيعرض بيانات عامة عن الشوب فقط.</li></ul>
+            <ul><li data-ar="التطبيق مبيطلبش باسورد حسابك في Valorant، بيعرض بيانات عامة عن الشوب فقط." data-en="The app never asks for your Valorant password — it only displays general store data.">التطبيق مبيطلبش باسورد حسابك في Valorant، بيعرض بيانات عامة عن الشوب فقط.</li></ul>
           </div>
         </div>
         <div class="faq-item">
           <button class="faq-toggle" type="button" aria-expanded="false">
             <span class="icon">❓</span>
-            <h3>هل التطبيق مجاني؟</h3>
+            <h3 data-ar="هل التطبيق مجاني؟" data-en="Is the app free?">هل التطبيق مجاني؟</h3>
             <span class="chevron">+</span>
           </button>
           <div class="faq-body">
-            <ul><li>أيوه، التطبيق مجاني بالكامل ومفيش أي اشتراكات.</li></ul>
+            <ul><li data-ar="أيوه، التطبيق مجاني بالكامل ومفيش أي اشتراكات." data-en="Yes, the app is completely free with no subscriptions at all.">أيوه، التطبيق مجاني بالكامل ومفيش أي اشتراكات.</li></ul>
           </div>
         </div>
         <div class="faq-item">
           <button class="faq-toggle" type="button" aria-expanded="false">
             <span class="icon">❓</span>
-            <h3>ليه مش موجود على جوجل بلاي؟</h3>
+            <h3 data-ar="ليه مش موجود على جوجل بلاي؟" data-en="Why isn't it on Google Play?">ليه مش موجود على جوجل بلاي؟</h3>
             <span class="chevron">+</span>
           </button>
           <div class="faq-body">
-            <ul><li>لأنه تطبيق غير رسمي، فبيتم تحميله كملف APK مباشر.</li></ul>
+            <ul><li data-ar="لأنه تطبيق غير رسمي، فبيتم تحميله كملف APK مباشر." data-en="Because it's an unofficial app, it's distributed as a direct APK file instead.">لأنه تطبيق غير رسمي، فبيتم تحميله كملف APK مباشر.</li></ul>
           </div>
         </div>
       </div>
@@ -900,7 +942,7 @@
 
   <footer>
     <div class="wrap">
-      &copy; <span id="valo-shop-year"></span> Valo Shop — تطبيق غير رسمي، غير تابع لـ Riot Games.
+      <span data-ar="© " data-en="© ">© </span><span id="valo-shop-year"></span><span data-ar=" Valo Shop — تطبيق غير رسمي، غير تابع لـ Riot Games." data-en=" Valo Shop — Unofficial app, not affiliated with Riot Games."> Valo Shop — تطبيق غير رسمي، غير تابع لـ Riot Games.</span>
     </div>
   </footer>
 
@@ -911,6 +953,90 @@
 (function(){
   var root = document.getElementById('valo-shop-page');
   if(!root) return;
+
+  var LANG_KEY = 'valo-shop-lang';
+  var STRINGS = {
+    ar: {
+      title: 'Valo Shop — تابع شوب Valorant من موبايلك',
+      desc: 'Valo Shop بيوريك الشوب اليومي، الباندلات، النايت ماركت، والرانك بتاعك من غير ما تفتح اللعبة أصلًا.',
+      totopLabel: 'رجوع لأعلى الصفحة',
+      downloadLink: 'تحميل',
+      noOldVersions: 'لسه مفيش إصدارات قديمة متاحة.',
+      fetchFailed: 'مقدرناش نجيب الإصدارات القديمة دلوقتي.',
+      hideOld: 'إخفاء الإصدارات القديمة',
+      showOld: 'عرض الإصدارات القديمة',
+      dash: '—',
+      locale: 'ar-EG'
+    },
+    en: {
+      title: 'Valo Shop — Track your Valorant store from your phone',
+      desc: "Valo Shop shows you today's store, bundles, the Night Market, and your rank — without ever opening the game.",
+      totopLabel: 'Back to top',
+      downloadLink: 'Download',
+      noOldVersions: 'No previous versions available yet.',
+      fetchFailed: "Couldn't fetch previous versions right now.",
+      hideOld: 'Hide previous versions',
+      showOld: 'Show previous versions',
+      dash: '—',
+      locale: 'en-US'
+    }
+  };
+
+  var currentLang = 'ar';
+  try{
+    var saved = localStorage.getItem(LANG_KEY);
+    if(saved === 'ar' || saved === 'en'){ currentLang = saved; }
+  }catch(e){}
+
+  function applyLang(lang){
+    currentLang = lang;
+    try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
+
+    var dir = lang === 'ar' ? 'rtl' : 'ltr';
+    root.setAttribute('dir', dir);
+    root.setAttribute('lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+
+    var titleEl = document.getElementById('valo-title');
+    if(titleEl){ titleEl.textContent = STRINGS[lang].title; }
+    var descEl = document.getElementById('valo-desc');
+    if(descEl){ descEl.setAttribute('content', STRINGS[lang].desc); }
+
+    root.querySelectorAll('[data-ar]').forEach(function(el){
+      var val = el.getAttribute('data-' + lang);
+      if(val != null){ el.innerHTML = val; }
+    });
+    root.querySelectorAll('[data-alt-ar]').forEach(function(el){
+      var val = el.getAttribute('data-alt-' + lang);
+      if(val != null){ el.setAttribute('alt', val); }
+    });
+
+    var totop = document.getElementById('valo-shop-totop');
+    if(totop){ totop.setAttribute('aria-label', STRINGS[lang].totopLabel); }
+
+    var arBtn = document.getElementById('valo-lang-ar');
+    var enBtn = document.getElementById('valo-lang-en');
+    if(arBtn){ arBtn.classList.toggle('active', lang === 'ar'); }
+    if(enBtn){ enBtn.classList.toggle('active', lang === 'en'); }
+
+    var oldVersionsWrap = document.getElementById('valo-old-versions-wrap');
+    var toggleLabel = document.getElementById('valo-old-versions-toggle-label');
+    if(toggleLabel && oldVersionsWrap){
+      var isOpen = oldVersionsWrap.classList.contains('open');
+      toggleLabel.textContent = isOpen ? STRINGS[lang].hideOld : STRINGS[lang].showOld;
+    }
+
+    if(typeof window.valoRefreshReleaseText === 'function'){
+      window.valoRefreshReleaseText();
+    }
+  }
+
+  var langAr = document.getElementById('valo-lang-ar');
+  var langEn = document.getElementById('valo-lang-en');
+  if(langAr){ langAr.addEventListener('click', function(){ applyLang('ar'); }); }
+  if(langEn){ langEn.addEventListener('click', function(){ applyLang('en'); }); }
+
+  applyLang(currentLang);
 
   var y = document.getElementById('valo-shop-year');
   if(y){ y.textContent = new Date().getFullYear(); }
@@ -996,7 +1122,7 @@
       var isOpen = oldVersionsWrap.classList.toggle('open');
       oldVersionsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       if(oldVersionsToggleLabel){
-        oldVersionsToggleLabel.textContent = isOpen ? 'إخفاء الإصدارات القديمة' : 'عرض الإصدارات القديمة';
+        oldVersionsToggleLabel.textContent = isOpen ? STRINGS[currentLang].hideOld : STRINGS[currentLang].showOld;
       }
     });
   }
@@ -1009,10 +1135,10 @@
       fetch(COUNTAPI_BASE + '/hit/' + key)
         .then(function(r){ return r.json(); })
         .then(function(data){
-          if(targetEl){ targetEl.textContent = Number(data.value).toLocaleString('ar-EG'); }
+          if(targetEl){ targetEl.textContent = Number(data.value).toLocaleString(STRINGS[currentLang].locale); }
         })
         .catch(function(){
-          if(targetEl){ targetEl.textContent = '—'; }
+          if(targetEl){ targetEl.textContent = STRINGS[currentLang].dash; }
         });
     }
 
@@ -1025,20 +1151,88 @@
     var downloadEl = document.getElementById('valo-download-count');
     var fileSizeEl = document.getElementById('valo-file-size');
     var oldVersionsList = document.getElementById('valo-old-versions-list');
+    var lastReleases = null;
 
     function formatBytes(bytes){
-      if(!bytes && bytes !== 0){ return '—'; }
+      if(!bytes && bytes !== 0){ return STRINGS[currentLang].dash; }
       var mb = bytes / (1024 * 1024);
       return mb.toFixed(1).replace(/\.0$/, '') + ' MB';
     }
 
     function formatDate(iso){
       try{
-        return new Date(iso).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+        return new Date(iso).toLocaleDateString(STRINGS[currentLang].locale, { year: 'numeric', month: 'short', day: 'numeric' });
       }catch(e){
         return '';
       }
     }
+
+    function renderOldVersions(releases){
+      if(!oldVersionsList){ return; }
+      oldVersionsList.innerHTML = '';
+      var olderReleases = releases.slice(1);
+      if(olderReleases.length === 0){
+        var emptyMsg = document.createElement('p');
+        emptyMsg.className = 'old-versions-empty';
+        emptyMsg.textContent = STRINGS[currentLang].noOldVersions;
+        oldVersionsList.appendChild(emptyMsg);
+        return;
+      }
+      olderReleases.forEach(function(release){
+        var asset = (release.assets || []).filter(function(a){ return a.name === GH_ASSET_NAME; })[0];
+        if(!asset){ return; }
+        var row = document.createElement('div');
+        row.className = 'old-version-row';
+
+        var mainDiv = document.createElement('div');
+        mainDiv.className = 'ver-main';
+
+        var tagSpan = document.createElement('span');
+        tagSpan.className = 'ver-tag';
+        tagSpan.textContent = release.tag_name || release.name || STRINGS[currentLang].dash;
+        mainDiv.appendChild(tagSpan);
+
+        var metaSpan = document.createElement('span');
+        metaSpan.className = 'ver-meta';
+        metaSpan.textContent = formatDate(release.published_at) + ' · ' + formatBytes(asset.size);
+        mainDiv.appendChild(metaSpan);
+
+        row.appendChild(mainDiv);
+
+        var link = document.createElement('a');
+        link.href = asset.browser_download_url;
+        link.textContent = STRINGS[currentLang].downloadLink;
+        row.appendChild(link);
+
+        oldVersionsList.appendChild(row);
+      });
+      if(oldVersionsList.children.length === 0){
+        var emptyMsg2 = document.createElement('p');
+        emptyMsg2.className = 'old-versions-empty';
+        emptyMsg2.textContent = STRINGS[currentLang].noOldVersions;
+        oldVersionsList.appendChild(emptyMsg2);
+      }
+    }
+
+    // Re-renders the already-fetched release data in whichever language is
+    // active now, without a new network request — called after a language
+    // switch so dates/sizes/labels match the chosen language immediately.
+    window.valoRefreshReleaseText = function(){
+      if(!lastReleases){ return; }
+      var total = 0;
+      lastReleases.forEach(function(release){
+        (release.assets || []).forEach(function(asset){
+          if(asset.name === GH_ASSET_NAME){
+            total += Number(asset.download_count) || 0;
+          }
+        });
+      });
+      if(downloadEl){ downloadEl.textContent = total.toLocaleString(STRINGS[currentLang].locale); }
+      var latest = lastReleases.length > 0 ? lastReleases[0] : null;
+      var latestAsset = latest ? (latest.assets || []).filter(function(a){ return a.name === GH_ASSET_NAME; })[0] : null;
+      if(fileSizeEl){ fileSizeEl.textContent = latestAsset ? formatBytes(latestAsset.size) : STRINGS[currentLang].dash; }
+      renderOldVersions(lastReleases);
+    };
 
     // بيجيب كل صفحات الـ Releases (GitHub بيرجع لغاية 100 في الصفحة، فلو فيه أكتر بنتبع رابط "next" من الـ Link header)
     function fetchAllReleases(url, acc){
@@ -1072,76 +1266,14 @@
       // shows the file size and version list stuck on an old release.
       fetchAllReleases('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/releases?per_page=100&_=' + Date.now())
         .then(function(releases){
-          var total = 0;
-          releases.forEach(function(release){
-            (release.assets || []).forEach(function(asset){
-              if(asset.name === GH_ASSET_NAME){
-                total += Number(asset.download_count) || 0;
-              }
-            });
-          });
-          if(downloadEl){
-            downloadEl.textContent = total.toLocaleString('ar-EG');
-          }
-
-          // GitHub بيرجع الإصدارات الأحدث الأول، فأول عنصر هو آخر نسخة
-          var latest = releases.length > 0 ? releases[0] : null;
-          var latestAsset = latest ? (latest.assets || []).filter(function(a){ return a.name === GH_ASSET_NAME; })[0] : null;
-          if(fileSizeEl){
-            fileSizeEl.textContent = latestAsset ? formatBytes(latestAsset.size) : '—';
-          }
-
-          if(oldVersionsList){
-            oldVersionsList.innerHTML = '';
-            var olderReleases = releases.slice(1);
-            if(olderReleases.length === 0){
-              var emptyMsg = document.createElement('p');
-              emptyMsg.className = 'old-versions-empty';
-              emptyMsg.textContent = 'لسه مفيش إصدارات قديمة متاحة.';
-              oldVersionsList.appendChild(emptyMsg);
-            } else {
-              olderReleases.forEach(function(release){
-                var asset = (release.assets || []).filter(function(a){ return a.name === GH_ASSET_NAME; })[0];
-                if(!asset){ return; }
-                var row = document.createElement('div');
-                row.className = 'old-version-row';
-
-                var mainDiv = document.createElement('div');
-                mainDiv.className = 'ver-main';
-
-                var tagSpan = document.createElement('span');
-                tagSpan.className = 'ver-tag';
-                tagSpan.textContent = release.tag_name || release.name || '—';
-                mainDiv.appendChild(tagSpan);
-
-                var metaSpan = document.createElement('span');
-                metaSpan.className = 'ver-meta';
-                metaSpan.textContent = formatDate(release.published_at) + ' · ' + formatBytes(asset.size);
-                mainDiv.appendChild(metaSpan);
-
-                row.appendChild(mainDiv);
-
-                var link = document.createElement('a');
-                link.href = asset.browser_download_url;
-                link.textContent = 'تحميل';
-                row.appendChild(link);
-
-                oldVersionsList.appendChild(row);
-              });
-              if(oldVersionsList.children.length === 0){
-                var emptyMsg2 = document.createElement('p');
-                emptyMsg2.className = 'old-versions-empty';
-                emptyMsg2.textContent = 'لسه مفيش إصدارات قديمة متاحة.';
-                oldVersionsList.appendChild(emptyMsg2);
-              }
-            }
-          }
+          lastReleases = releases;
+          window.valoRefreshReleaseText();
         })
         .catch(function(){
-          if(downloadEl){ downloadEl.textContent = '—'; }
-          if(fileSizeEl){ fileSizeEl.textContent = '—'; }
+          if(downloadEl){ downloadEl.textContent = STRINGS[currentLang].dash; }
+          if(fileSizeEl){ fileSizeEl.textContent = STRINGS[currentLang].dash; }
           if(oldVersionsList){
-            oldVersionsList.innerHTML = '<p class="old-versions-empty">مقدرناش نجيب الإصدارات القديمة دلوقتي.</p>';
+            oldVersionsList.innerHTML = '<p class="old-versions-empty">' + STRINGS[currentLang].fetchFailed + '</p>';
           }
         });
     }
