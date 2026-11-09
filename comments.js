@@ -14,11 +14,15 @@
   };
   var FB_VER = '10.14.1';
   var COLLECTION = 'comments';
+  var REPLIES = 'replies';
   var USERS = 'users';
   var AGENTS_URL = 'https://valorant-api.com/v1/agents?isPlayableCharacter=true';
   var MAX_LEN = 500;
+  var MAX_NAME = 30;
   var COOLDOWN_MS = 30000;
   var LS_LAST = 'valo-comment-last';
+  var LS_ADMIN_AGENT = 'valo-admin-agent';
+  var LS_ADMIN_NAME = 'valo-admin-name';
 
   function lang(){ return root.getAttribute('lang') === 'en' ? 'en' : 'ar'; }
 
@@ -28,6 +32,14 @@
       pickHint: 'اختار أيجنت',
       lockedNote: 'الأيجنت ده مربوط بجهازك ومش هتقدر تغيره.',
       unlockedNote: 'اختيارك هيتثبت بعد أول تعليق ومش هتقدر تغيره بعد كده.',
+      adminNote: 'بتنشر كمشرف: تقدر تغيّر الأيجنت والاسم في أي وقت.',
+      nameLabel: 'الاسم الظاهر (اختياري)',
+      namePlaceholder: 'مثلاً: فريق Valo Shop',
+      badge: 'مشرف',
+      reply: 'رد',
+      replyPlaceholder: 'اكتب ردك…',
+      replySend: 'ابعت الرد',
+      cancel: 'إلغاء',
       confirmPick: 'هتختار «{n}» ومش هتقدر تغيره بعد كده. متأكد؟',
       placeholder: 'اكتب تعليقك هنا…',
       send: 'ابعت التعليق',
@@ -57,6 +69,14 @@
       pickHint: 'Pick an agent',
       lockedNote: 'This agent is tied to your device and cannot be changed.',
       unlockedNote: 'Your choice is locked after your first comment and cannot be changed later.',
+      adminNote: 'Posting as admin: you can change the agent and name any time.',
+      nameLabel: 'Display name (optional)',
+      namePlaceholder: 'e.g. Valo Shop Team',
+      badge: 'Admin',
+      reply: 'Reply',
+      replyPlaceholder: 'Write your reply…',
+      replySend: 'Post reply',
+      cancel: 'Cancel',
       confirmPick: 'You are picking "{n}" and will not be able to change it later. Continue?',
       placeholder: 'Write your comment here…',
       send: 'Post comment',
@@ -105,8 +125,12 @@
     '#valo-shop-page .cm-agent:hover{ background:var(--surface); }',
     '#valo-shop-page .cm-agent.selected{ border-color:var(--red); background:var(--surface); }',
     '#valo-shop-page .cm-agent span{ font-size:12px; color:var(--muted); font-weight:700; }',
-    '#valo-shop-page .cm-text{ width:100%; margin-top:16px; background:var(--bg); border:1px solid var(--line); color:var(--text); font-family:inherit; font-size:15px; line-height:1.7; padding:12px 14px; resize:vertical; min-height:92px; border-radius:0; }',
-    '#valo-shop-page .cm-text:focus{ outline:none; border-color:var(--red); }',
+    '#valo-shop-page .cm-name-wrap{ display:none; margin-top:16px; }',
+    '#valo-shop-page .cm-name-wrap.show{ display:block; }',
+    '#valo-shop-page .cm-name-wrap .cm-label{ margin-bottom:6px; }',
+    '#valo-shop-page .cm-input, #valo-shop-page .cm-text{ width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text); font-family:inherit; font-size:15px; line-height:1.7; padding:10px 14px; border-radius:0; }',
+    '#valo-shop-page .cm-input:focus, #valo-shop-page .cm-text:focus{ outline:none; border-color:var(--red); }',
+    '#valo-shop-page .cm-text{ margin-top:16px; resize:vertical; min-height:92px; padding:12px 14px; }',
     '#valo-shop-page .cm-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:12px; }',
     '#valo-shop-page .cm-count{ color:var(--muted-2); font-size:13px; }',
     '#valo-shop-page .cm-msg{ flex:1; font-size:13.5px; color:var(--muted); min-height:1em; }',
@@ -116,17 +140,24 @@
     '#valo-shop-page .cm-send[disabled]{ opacity:.55; cursor:default; }',
     '#valo-shop-page .cm-admin{ display:none; margin-top:20px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13.5px; color:var(--muted); }',
     '#valo-shop-page .cm-admin.show{ display:flex; }',
-    '#valo-shop-page .cm-admin button, #valo-shop-page .cm-del{ all:unset; box-sizing:border-box; cursor:pointer; color:var(--ice); font-weight:700; font-size:13px; border:1px solid var(--line); padding:5px 12px; }',
-    '#valo-shop-page .cm-admin button:hover{ border-color:var(--ice); }',
-    '#valo-shop-page .cm-del{ color:var(--red); margin-inline-start:auto; align-self:flex-start; }',
-    '#valo-shop-page .cm-del:hover{ border-color:var(--red); }',
-    '#valo-shop-page .cm-list{ margin-top:28px; display:flex; flex-direction:column; gap:14px; }',
+    '#valo-shop-page .cm-admin button, #valo-shop-page .cm-act, #valo-shop-page .cm-cancel{ all:unset; box-sizing:border-box; cursor:pointer; color:var(--ice); font-weight:700; font-size:13px; border:1px solid var(--line); padding:5px 12px; }',
+    '#valo-shop-page .cm-admin button:hover, #valo-shop-page .cm-act:hover, #valo-shop-page .cm-cancel:hover{ border-color:var(--ice); }',
+    '#valo-shop-page .cm-act.del{ color:var(--red); }',
+    '#valo-shop-page .cm-act.del:hover{ border-color:var(--red); }',
+    '#valo-shop-page .cm-actions{ display:flex; gap:6px; flex-wrap:wrap; margin-inline-start:auto; align-self:flex-start; }',
+    '#valo-shop-page .cm-list{ margin-top:28px; display:flex; flex-direction:column; gap:18px; }',
+    '#valo-shop-page .cm-thread{ display:flex; flex-direction:column; gap:10px; }',
     '#valo-shop-page .cm-item{ display:flex; gap:14px; align-items:flex-start; background:var(--surface); border:1px solid var(--line); padding:16px; }',
+    '#valo-shop-page .cm-reply{ margin-inline-start:44px; border-inline-start:2px solid var(--red); padding:12px 14px; }',
+    '#valo-shop-page .cm-reply .cm-avatar{ width:34px; height:34px; font-size:17px; }',
     '#valo-shop-page .cm-body{ min-width:0; flex:1; }',
-    '#valo-shop-page .cm-head{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:4px; }',
+    '#valo-shop-page .cm-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px; }',
     '#valo-shop-page .cm-name{ font-weight:800; font-size:15px; }',
+    '#valo-shop-page .cm-badge{ background:var(--red); color:#0A0C0F; font-size:11px; font-weight:900; padding:0 8px; line-height:1.7; }',
     '#valo-shop-page .cm-time{ color:var(--muted-2); font-size:12.5px; }',
     '#valo-shop-page .cm-content{ color:var(--text); font-size:15px; line-height:1.8; margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }',
+    '#valo-shop-page .cm-replyform{ margin-inline-start:44px; display:flex; flex-direction:column; gap:8px; }',
+    '#valo-shop-page .cm-replyform .cm-text{ margin-top:0; min-height:72px; }',
     '#valo-shop-page .cm-state{ color:var(--muted-2); font-size:14px; text-align:center; padding:18px 0; }'
   ].join('\n');
   var style = document.createElement('style');
@@ -151,6 +182,10 @@
         '</button>' +
         '<span class="cm-note" id="cm-note"></span>' +
         '<div class="cm-picker" id="cm-picker"><div class="cm-grid" id="cm-grid"></div></div>' +
+        '<div class="cm-name-wrap" id="cm-name-wrap">' +
+          '<span class="cm-label" id="cm-name-label"></span>' +
+          '<input type="text" class="cm-input" id="cm-name-input" maxlength="' + MAX_NAME + '">' +
+        '</div>' +
         '<textarea class="cm-text" id="cm-text" maxlength="' + MAX_LEN + '" rows="3"></textarea>' +
         '<div class="cm-row">' +
           '<span class="cm-count" id="cm-count">0/' + MAX_LEN + '</span>' +
@@ -167,6 +202,7 @@
   var el = {
     pickLabel: $('cm-pick-label'), agentBtn: $('cm-agent-btn'), agentAvatar: $('cm-agent-avatar'),
     agentName: $('cm-agent-name'), note: $('cm-note'), picker: $('cm-picker'), grid: $('cm-grid'),
+    nameWrap: $('cm-name-wrap'), nameLabel: $('cm-name-label'), nameInput: $('cm-name-input'),
     text: $('cm-text'), count: $('cm-count'), msg: $('cm-msg'), send: $('cm-send'),
     admin: $('cm-admin'), list: $('cm-list')
   };
@@ -180,9 +216,13 @@
   var currentUser = null;
   var isAdmin = false;
   var lastDocs = null;
+  var repliesByParent = {};
   var listState = 'loading';
   var busy = false;
   var fb = null;
+  var replyOpenId = null;
+  var replyDrafts = {};
+  var pendingRender = false;
 
   // ---------- Word filter (client side) ----------
   function norm(s){
@@ -251,12 +291,15 @@
   function renderStatic(){
     el.pickLabel.textContent = t('pick');
     el.text.setAttribute('placeholder', t('placeholder'));
+    el.nameLabel.textContent = t('nameLabel');
+    el.nameInput.setAttribute('placeholder', t('namePlaceholder'));
+    el.nameWrap.classList.toggle('show', isAdmin);
     if(busy){ el.send.textContent = t('sending'); }
     else if(!isReady() && !authFailed){ el.send.textContent = t('preparing'); }
     else { el.send.textContent = t('send'); }
     el.send.disabled = busy || (!isReady() && !authFailed);
     el.agentName.textContent = selected ? selected.displayName : t('pickHint');
-    el.note.textContent = lockedId ? t('lockedNote') : t('unlockedNote');
+    el.note.textContent = isAdmin ? t('adminNote') : (lockedId ? t('lockedNote') : t('unlockedNote'));
   }
 
   function renderSelected(){
@@ -271,11 +314,20 @@
     });
   }
 
-  // When the account already has a locked agent, show it and stop the picker from opening.
+  // Locked agent for regular visitors; admin can always switch agent and name.
   function syncIdentity(){
-    if(lockedId && agentsById[lockedId]){ selected = agentsById[lockedId]; }
-    el.agentBtn.classList.toggle('locked', !!lockedId);
-    if(lockedId){ togglePicker(false); }
+    if(isAdmin){
+      if(!selected){
+        try{
+          var savedId = localStorage.getItem(LS_ADMIN_AGENT);
+          if(savedId && agentsById[savedId]){ selected = agentsById[savedId]; }
+        }catch(err){}
+      }
+    } else if(lockedId && agentsById[lockedId]){
+      selected = agentsById[lockedId];
+    }
+    el.agentBtn.classList.toggle('locked', !isAdmin && !!lockedId);
+    if(!isAdmin && lockedId){ togglePicker(false); }
     renderSelected();
     renderStatic();
   }
@@ -310,15 +362,139 @@
     }
   }
 
+  function deleteReply(id){
+    if(!fb || !isAdmin){ return; }
+    if(!window.confirm(t('delConfirm'))){ return; }
+    fb.deleteDoc(fb.doc(fb.db, REPLIES, id)).catch(function(){ setMsg(t('delFail'), 'err'); });
+  }
+
   function deleteComment(id){
     if(!fb || !isAdmin){ return; }
     if(!window.confirm(t('delConfirm'))){ return; }
-    fb.deleteDoc(fb.doc(fb.db, COLLECTION, id)).catch(function(){
+    var jobs = (repliesByParent[id] || []).map(function(r){ return fb.deleteDoc(fb.doc(fb.db, REPLIES, r.id)); });
+    Promise.all(jobs).then(function(){
+      return fb.deleteDoc(fb.doc(fb.db, COLLECTION, id));
+    }).catch(function(){
       setMsg(t('delFail'), 'err');
     });
   }
 
+  function makeEntry(c, isReply){
+    var agent = agentsById[c.agentId];
+    var item = document.createElement('div');
+    item.className = 'cm-item' + (isReply ? ' cm-reply' : '');
+    item.appendChild(makeAvatar(agent));
+    var body = document.createElement('div');
+    body.className = 'cm-body';
+    var head = document.createElement('div');
+    head.className = 'cm-head';
+    var name = document.createElement('span');
+    name.className = 'cm-name';
+    name.textContent = c.name || (agent ? agent.displayName : 'Agent');
+    head.appendChild(name);
+    if(c.admin){
+      var badge = document.createElement('span');
+      badge.className = 'cm-badge';
+      badge.textContent = t('badge');
+      head.appendChild(badge);
+    }
+    var time = document.createElement('span');
+    time.className = 'cm-time';
+    time.textContent = formatTime(c.createdAt);
+    head.appendChild(time);
+    var p = document.createElement('p');
+    p.className = 'cm-content';
+    p.textContent = c.text;
+    body.appendChild(head);
+    body.appendChild(p);
+    item.appendChild(body);
+    if(isAdmin){
+      var actions = document.createElement('div');
+      actions.className = 'cm-actions';
+      if(!isReply){
+        var rb = document.createElement('button');
+        rb.type = 'button';
+        rb.className = 'cm-act';
+        rb.textContent = t('reply');
+        rb.addEventListener('click', function(){
+          replyOpenId = (replyOpenId === c.id) ? null : c.id;
+          renderList();
+        });
+        actions.appendChild(rb);
+      }
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'cm-act del';
+      del.textContent = t('del');
+      del.addEventListener('click', function(){ isReply ? deleteReply(c.id) : deleteComment(c.id); });
+      actions.appendChild(del);
+      item.appendChild(actions);
+    }
+    return item;
+  }
+
+  function makeReplyForm(parentId){
+    var form = document.createElement('div');
+    form.className = 'cm-replyform';
+    var ta = document.createElement('textarea');
+    ta.className = 'cm-text';
+    ta.maxLength = MAX_LEN;
+    ta.rows = 2;
+    ta.placeholder = t('replyPlaceholder');
+    ta.value = replyDrafts[parentId] || '';
+    ta.addEventListener('input', function(){ replyDrafts[parentId] = ta.value; });
+    ta.addEventListener('blur', function(){
+      if(pendingRender){ setTimeout(function(){ if(pendingRender){ pendingRender = false; renderList(); } }, 150); }
+    });
+    var row = document.createElement('div');
+    row.className = 'cm-row';
+    var msg = document.createElement('span');
+    msg.className = 'cm-msg';
+    var go = document.createElement('button');
+    go.type = 'button';
+    go.className = 'btn btn-primary cm-send';
+    go.textContent = t('replySend');
+    var cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'cm-cancel';
+    cancel.textContent = t('cancel');
+    cancel.addEventListener('click', function(){ replyOpenId = null; renderList(); });
+    go.addEventListener('click', function(){
+      if(busy){ return; }
+      var res = buildPayload(ta.value.trim(), parentId);
+      if(res.err){
+        msg.textContent = t(res.err);
+        msg.className = 'cm-msg err';
+        if(res.err === 'needAgent'){ togglePicker(true); }
+        return;
+      }
+      busy = true;
+      go.disabled = true;
+      renderStatic();
+      fb.addDoc(fb.collection(fb.db, REPLIES), res.data).then(function(){
+        replyDrafts[parentId] = '';
+        replyOpenId = null;
+        busy = false;
+        renderStatic();
+        renderList();
+      }).catch(function(){
+        busy = false;
+        go.disabled = false;
+        renderStatic();
+        msg.textContent = t('error');
+        msg.className = 'cm-msg err';
+      });
+    });
+    row.appendChild(msg);
+    row.appendChild(cancel);
+    row.appendChild(go);
+    form.appendChild(ta);
+    form.appendChild(row);
+    return form;
+  }
+
   function renderList(){
+    pendingRender = false;
     el.list.innerHTML = '';
     if(listState === 'loading'){
       var l = document.createElement('div'); l.className = 'cm-state'; l.textContent = t('loading'); el.list.appendChild(l); return;
@@ -330,38 +506,27 @@
       var m = document.createElement('div'); m.className = 'cm-state'; m.textContent = t('empty'); el.list.appendChild(m); return;
     }
     lastDocs.forEach(function(c){
-      var agent = agentsById[c.agentId];
-      var item = document.createElement('div');
-      item.className = 'cm-item';
-      item.appendChild(makeAvatar(agent));
-      var body = document.createElement('div');
-      body.className = 'cm-body';
-      var head = document.createElement('div');
-      head.className = 'cm-head';
-      var name = document.createElement('span');
-      name.className = 'cm-name';
-      name.textContent = agent ? agent.displayName : 'Agent';
-      var time = document.createElement('span');
-      time.className = 'cm-time';
-      time.textContent = formatTime(c.createdAt);
-      head.appendChild(name);
-      head.appendChild(time);
-      var p = document.createElement('p');
-      p.className = 'cm-content';
-      p.textContent = c.text;
-      body.appendChild(head);
-      body.appendChild(p);
-      item.appendChild(body);
-      if(isAdmin){
-        var del = document.createElement('button');
-        del.type = 'button';
-        del.className = 'cm-del';
-        del.textContent = t('del');
-        del.addEventListener('click', function(){ deleteComment(c.id); });
-        item.appendChild(del);
+      var thread = document.createElement('div');
+      thread.className = 'cm-thread';
+      thread.appendChild(makeEntry(c, false));
+      (repliesByParent[c.id] || []).forEach(function(r){
+        thread.appendChild(makeEntry(r, true));
+      });
+      if(isAdmin && replyOpenId === c.id){
+        thread.appendChild(makeReplyForm(c.id));
       }
-      el.list.appendChild(item);
+      el.list.appendChild(thread);
     });
+  }
+
+  // Live updates should not wipe a reply the admin is typing.
+  function renderListSafe(){
+    var a = document.activeElement;
+    if(replyOpenId && a && a.tagName === 'TEXTAREA' && el.list.contains(a)){
+      pendingRender = true;
+      return;
+    }
+    renderList();
   }
 
   function renderPicker(){
@@ -376,8 +541,9 @@
       n.textContent = a.displayName;
       b.appendChild(n);
       b.addEventListener('click', function(){
-        if(lockedId){ return; }
+        if(!isAdmin && lockedId){ return; }
         selected = a;
+        if(isAdmin){ try{ localStorage.setItem(LS_ADMIN_AGENT, a.uuid); }catch(err){} }
         renderSelected();
         togglePicker(false);
       });
@@ -388,7 +554,7 @@
 
   function togglePicker(force){
     var open = typeof force === 'boolean' ? force : !el.picker.classList.contains('open');
-    if(lockedId){ open = false; }
+    if(!isAdmin && lockedId){ open = false; }
     el.picker.classList.toggle('open', open);
     el.agentBtn.classList.toggle('open', open);
     el.agentBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -398,23 +564,52 @@
   el.text.addEventListener('input', function(){
     el.count.textContent = el.text.value.length + '/' + MAX_LEN;
   });
+  el.nameInput.addEventListener('input', function(){
+    try{ localStorage.setItem(LS_ADMIN_NAME, el.nameInput.value); }catch(err){}
+  });
 
   // ---------- Sending ----------
+  // Builds the document to save, or an error key (looked up with t()).
+  function buildPayload(text, parentId){
+    if(authFailed || !fb || !currentUser){ return { err: 'error' }; }
+    if(!isReady()){ return { err: 'preparing' }; }
+    var agent = isAdmin ? selected : (lockedId ? agentsById[lockedId] : selected);
+    if(!agent){ return { err: 'needAgent' }; }
+    if(!text){ return { err: 'needText' }; }
+    if(!isAdmin){
+      if(/(https?:\/\/|www\.)/i.test(text)){ return { err: 'noLinks' }; }
+      if(hasBadWord(text)){ return { err: 'badWords' }; }
+      try{
+        var last = Number(localStorage.getItem(LS_LAST)) || 0;
+        if(Date.now() - last < COOLDOWN_MS){ return { err: 'wait' }; }
+      }catch(err){}
+    }
+    var data = {
+      agentId: agent.uuid,
+      uid: currentUser.uid,
+      text: text,
+      createdAt: fb.serverTimestamp()
+    };
+    if(isAdmin){
+      data.admin = true;
+      var nm = el.nameInput.value.trim().slice(0, MAX_NAME);
+      if(nm){ data.name = nm; }
+    }
+    if(parentId){ data.parentId = parentId; }
+    return { data: data, agent: agent };
+  }
+
   function send(){
     if(busy){ return; }
-    var text = el.text.value.trim();
-    if(authFailed || !fb || !currentUser){ setMsg(t('error'), 'err'); return; }
-    if(!isReady()){ return; }
-    var agent = lockedId ? agentsById[lockedId] : selected;
-    if(!agent){ setMsg(t('needAgent'), 'err'); togglePicker(true); return; }
-    if(!text){ setMsg(t('needText'), 'err'); return; }
-    if(/(https?:\/\/|www\.)/i.test(text)){ setMsg(t('noLinks'), 'err'); return; }
-    if(hasBadWord(text)){ setMsg(t('badWords'), 'err'); return; }
-    try{
-      var last = Number(localStorage.getItem(LS_LAST)) || 0;
-      if(Date.now() - last < COOLDOWN_MS){ setMsg(t('wait'), 'err'); return; }
-    }catch(err){}
-    if(!lockedId){
+    var res = buildPayload(el.text.value.trim(), null);
+    if(res.err){
+      if(res.err === 'preparing'){ return; }
+      setMsg(t(res.err), 'err');
+      if(res.err === 'needAgent'){ togglePicker(true); }
+      return;
+    }
+    var agent = res.agent;
+    if(!isAdmin && !lockedId){
       if(!window.confirm(t('confirmPick').replace('{n}', agent.displayName))){ return; }
     }
 
@@ -423,7 +618,7 @@
     setMsg('');
 
     var uid = currentUser.uid;
-    var ensureProfile = lockedId
+    var ensureProfile = (isAdmin || lockedId)
       ? Promise.resolve()
       : fb.setDoc(fb.doc(fb.db, USERS, uid), { agentId: agent.uuid, createdAt: fb.serverTimestamp() })
           .then(function(){
@@ -432,16 +627,11 @@
           });
 
     ensureProfile.then(function(){
-      return fb.addDoc(fb.collection(fb.db, COLLECTION), {
-        agentId: lockedId,
-        uid: uid,
-        text: text,
-        createdAt: fb.serverTimestamp()
-      });
+      return fb.addDoc(fb.collection(fb.db, COLLECTION), res.data);
     }).then(function(){
       el.text.value = '';
       el.count.textContent = '0/' + MAX_LEN;
-      try{ localStorage.setItem(LS_LAST, String(Date.now())); }catch(err){}
+      if(!isAdmin){ try{ localStorage.setItem(LS_LAST, String(Date.now())); }catch(err){} }
       setMsg(t('sent'), 'ok');
     }).catch(function(){
       setMsg(t('error'), 'err');
@@ -481,6 +671,15 @@
     isAdmin = !user.isAnonymous;
     profileLoaded = false;
     lockedId = null;
+    if(isAdmin){
+      try{ el.nameInput.value = localStorage.getItem(LS_ADMIN_NAME) || ''; }catch(err){}
+      profileLoaded = true;
+      syncIdentity();
+      renderAdmin();
+      renderList();
+      return;
+    }
+    selected = null;
     renderStatic();
     renderAdmin();
     renderList();
@@ -524,14 +723,28 @@
       f.onSnapshot(q, function(snap){
         lastDocs = snap.docs.map(function(d){
           var data = d.data({ serverTimestamps: 'estimate' });
-          return { id: d.id, agentId: data.agentId, text: data.text, createdAt: data.createdAt };
+          return { id: d.id, agentId: data.agentId, name: data.name, admin: !!data.admin, text: data.text, createdAt: data.createdAt };
         });
         listState = 'ready';
-        renderList();
+        renderListSafe();
       }, function(){
         listState = 'error';
         renderList();
       });
+
+      var rq = f.query(f.collection(fb.db, REPLIES), f.orderBy('createdAt', 'asc'), f.limit(300));
+      f.onSnapshot(rq, function(snap){
+        var map = {};
+        snap.docs.forEach(function(d){
+          var data = d.data({ serverTimestamps: 'estimate' });
+          if(!data.parentId){ return; }
+          (map[data.parentId] = map[data.parentId] || []).push({
+            id: d.id, agentId: data.agentId, name: data.name, admin: !!data.admin, text: data.text, createdAt: data.createdAt
+          });
+        });
+        repliesByParent = map;
+        renderListSafe();
+      }, function(){});
 
       a.onAuthStateChanged(fb.auth, onUser);
       renderAdmin();
