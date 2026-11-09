@@ -14,10 +14,10 @@
   };
   var FB_VER = '10.14.1';
   var COLLECTION = 'comments';
+  var USERS = 'users';
   var AGENTS_URL = 'https://valorant-api.com/v1/agents?isPlayableCharacter=true';
   var MAX_LEN = 500;
   var COOLDOWN_MS = 30000;
-  var LS_AGENT = 'valo-comment-agent';
   var LS_LAST = 'valo-comment-last';
 
   function lang(){ return root.getAttribute('lang') === 'en' ? 'en' : 'ar'; }
@@ -26,9 +26,13 @@
     ar: {
       pick: 'اختار الأيجنت بتاعك',
       pickHint: 'اختار أيجنت',
+      lockedNote: 'الأيجنت ده مربوط بجهازك ومش هتقدر تغيره.',
+      unlockedNote: 'اختيارك هيتثبت بعد أول تعليق ومش هتقدر تغيره بعد كده.',
+      confirmPick: 'هتختار «{n}» ومش هتقدر تغيره بعد كده. متأكد؟',
       placeholder: 'اكتب تعليقك هنا…',
       send: 'ابعت التعليق',
       sending: 'بيتبعت…',
+      preparing: 'بنجهّز حسابك…',
       needAgent: 'اختار أيجنت الأول.',
       needText: 'اكتب تعليق الأول.',
       badWords: 'التعليق فيه ألفاظ مش مسموحة.',
@@ -39,14 +43,25 @@
       empty: 'مفيش تعليقات لسه. كن أول واحد!',
       loading: 'بنحمّل التعليقات…',
       loadFail: 'مقدرناش نحمّل التعليقات دلوقتي.',
+      adminLogin: 'دخول المشرف (Google)',
+      adminLogout: 'خروج',
+      adminAs: 'مشرف: ',
+      adminFail: 'مقدرناش نسجّل دخول المشرف.',
+      del: 'مسح',
+      delConfirm: 'تمسح التعليق ده؟',
+      delFail: 'معرفناش نمسح التعليق.',
       locale: 'ar-EG'
     },
     en: {
       pick: 'Choose your agent',
       pickHint: 'Pick an agent',
+      lockedNote: 'This agent is tied to your device and cannot be changed.',
+      unlockedNote: 'Your choice is locked after your first comment and cannot be changed later.',
+      confirmPick: 'You are picking "{n}" and will not be able to change it later. Continue?',
       placeholder: 'Write your comment here…',
       send: 'Post comment',
       sending: 'Posting…',
+      preparing: 'Setting things up…',
       needAgent: 'Pick an agent first.',
       needText: 'Write a comment first.',
       badWords: 'Your comment contains words that are not allowed.',
@@ -57,6 +72,13 @@
       empty: 'No comments yet. Be the first!',
       loading: 'Loading comments…',
       loadFail: "Couldn't load comments right now.",
+      adminLogin: 'Admin sign-in (Google)',
+      adminLogout: 'Sign out',
+      adminAs: 'Admin: ',
+      adminFail: "Couldn't sign in as admin.",
+      del: 'Delete',
+      delConfirm: 'Delete this comment?',
+      delFail: "Couldn't delete the comment.",
       locale: 'en-US'
     }
   };
@@ -68,9 +90,12 @@
     '#valo-shop-page .cm-label{ color:var(--muted); font-size:13.5px; font-weight:700; margin-bottom:10px; display:block; }',
     '#valo-shop-page .cm-agent-btn{ all:unset; box-sizing:border-box; cursor:pointer; display:inline-flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--line); padding:8px 16px 8px 12px; transition:border-color .2s ease; }',
     '#valo-shop-page .cm-agent-btn:hover, #valo-shop-page .cm-agent-btn.open{ border-color:var(--red); }',
+    '#valo-shop-page .cm-agent-btn.locked{ cursor:default; border-color:var(--line); }',
+    '#valo-shop-page .cm-agent-btn.locked .cm-chev{ display:none; }',
     '#valo-shop-page .cm-agent-btn .cm-agent-name{ font-weight:800; font-size:15px; }',
     '#valo-shop-page .cm-agent-btn .cm-chev{ color:var(--red); font-size:18px; transition:transform .3s ease; }',
     '#valo-shop-page .cm-agent-btn.open .cm-chev{ transform:rotate(180deg); }',
+    '#valo-shop-page .cm-note{ display:block; color:var(--muted-2); font-size:13px; margin-top:10px; }',
     '#valo-shop-page .cm-avatar{ width:44px; height:44px; border-radius:50%; background:var(--bg); border:1px solid var(--line); overflow:hidden; flex:none; display:flex; align-items:center; justify-content:center; font-size:22px; }',
     '#valo-shop-page .cm-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }',
     '#valo-shop-page .cm-picker{ display:none; margin-top:14px; border:1px solid var(--line); background:var(--bg); padding:12px; max-height:260px; overflow-y:auto; }',
@@ -89,6 +114,12 @@
     '#valo-shop-page .cm-msg.ok{ color:var(--ice); }',
     '#valo-shop-page .cm-send{ padding:12px 24px; }',
     '#valo-shop-page .cm-send[disabled]{ opacity:.55; cursor:default; }',
+    '#valo-shop-page .cm-admin{ display:none; margin-top:20px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13.5px; color:var(--muted); }',
+    '#valo-shop-page .cm-admin.show{ display:flex; }',
+    '#valo-shop-page .cm-admin button, #valo-shop-page .cm-del{ all:unset; box-sizing:border-box; cursor:pointer; color:var(--ice); font-weight:700; font-size:13px; border:1px solid var(--line); padding:5px 12px; }',
+    '#valo-shop-page .cm-admin button:hover{ border-color:var(--ice); }',
+    '#valo-shop-page .cm-del{ color:var(--red); margin-inline-start:auto; align-self:flex-start; }',
+    '#valo-shop-page .cm-del:hover{ border-color:var(--red); }',
     '#valo-shop-page .cm-list{ margin-top:28px; display:flex; flex-direction:column; gap:14px; }',
     '#valo-shop-page .cm-item{ display:flex; gap:14px; align-items:flex-start; background:var(--surface); border:1px solid var(--line); padding:16px; }',
     '#valo-shop-page .cm-body{ min-width:0; flex:1; }',
@@ -118,6 +149,7 @@
           '<span class="cm-agent-name" id="cm-agent-name"></span>' +
           '<span class="cm-chev">⌄</span>' +
         '</button>' +
+        '<span class="cm-note" id="cm-note"></span>' +
         '<div class="cm-picker" id="cm-picker"><div class="cm-grid" id="cm-grid"></div></div>' +
         '<textarea class="cm-text" id="cm-text" maxlength="' + MAX_LEN + '" rows="3"></textarea>' +
         '<div class="cm-row">' +
@@ -126,6 +158,7 @@
           '<button type="button" class="btn btn-primary cm-send" id="cm-send"></button>' +
         '</div>' +
       '</div>' +
+      '<div class="cm-admin" id="cm-admin"></div>' +
       '<div class="cm-list" id="cm-list"></div>' +
     '</div>';
   root.insertBefore(section, footer);
@@ -133,13 +166,19 @@
   function $(id){ return document.getElementById(id); }
   var el = {
     pickLabel: $('cm-pick-label'), agentBtn: $('cm-agent-btn'), agentAvatar: $('cm-agent-avatar'),
-    agentName: $('cm-agent-name'), picker: $('cm-picker'), grid: $('cm-grid'), text: $('cm-text'),
-    count: $('cm-count'), msg: $('cm-msg'), send: $('cm-send'), list: $('cm-list')
+    agentName: $('cm-agent-name'), note: $('cm-note'), picker: $('cm-picker'), grid: $('cm-grid'),
+    text: $('cm-text'), count: $('cm-count'), msg: $('cm-msg'), send: $('cm-send'),
+    admin: $('cm-admin'), list: $('cm-list')
   };
 
   var agents = [];
   var agentsById = {};
   var selected = null;
+  var lockedId = null;
+  var profileLoaded = false;
+  var authFailed = false;
+  var currentUser = null;
+  var isAdmin = false;
   var lastDocs = null;
   var listState = 'loading';
   var busy = false;
@@ -207,11 +246,17 @@
     }catch(e){ return ''; }
   }
 
+  function isReady(){ return !!currentUser && profileLoaded; }
+
   function renderStatic(){
     el.pickLabel.textContent = t('pick');
     el.text.setAttribute('placeholder', t('placeholder'));
-    el.send.textContent = busy ? t('sending') : t('send');
+    if(busy){ el.send.textContent = t('sending'); }
+    else if(!isReady() && !authFailed){ el.send.textContent = t('preparing'); }
+    else { el.send.textContent = t('send'); }
+    el.send.disabled = busy || (!isReady() && !authFailed);
     el.agentName.textContent = selected ? selected.displayName : t('pickHint');
+    el.note.textContent = lockedId ? t('lockedNote') : t('unlockedNote');
   }
 
   function renderSelected(){
@@ -223,6 +268,53 @@
     var btns = el.grid.querySelectorAll('.cm-agent');
     btns.forEach(function(b){
       b.classList.toggle('selected', !!selected && b.getAttribute('data-id') === selected.uuid);
+    });
+  }
+
+  // When the account already has a locked agent, show it and stop the picker from opening.
+  function syncIdentity(){
+    if(lockedId && agentsById[lockedId]){ selected = agentsById[lockedId]; }
+    el.agentBtn.classList.toggle('locked', !!lockedId);
+    if(lockedId){ togglePicker(false); }
+    renderSelected();
+    renderStatic();
+  }
+
+  function renderAdmin(){
+    el.admin.innerHTML = '';
+    var show = isAdmin || location.hash === '#admin';
+    el.admin.classList.toggle('show', show);
+    if(!show){ return; }
+    if(isAdmin){
+      var who = document.createElement('span');
+      who.textContent = t('adminAs') + ((currentUser && currentUser.email) || '');
+      var out = document.createElement('button');
+      out.type = 'button';
+      out.textContent = t('adminLogout');
+      out.addEventListener('click', function(){
+        if(fb){ fb.signOut(fb.auth).catch(function(){}); }
+      });
+      el.admin.appendChild(who);
+      el.admin.appendChild(out);
+    } else {
+      var inn = document.createElement('button');
+      inn.type = 'button';
+      inn.textContent = t('adminLogin');
+      inn.addEventListener('click', function(){
+        if(!fb){ return; }
+        fb.signInWithPopup(fb.auth, new fb.GoogleAuthProvider()).catch(function(){
+          setMsg(t('adminFail'), 'err');
+        });
+      });
+      el.admin.appendChild(inn);
+    }
+  }
+
+  function deleteComment(id){
+    if(!fb || !isAdmin){ return; }
+    if(!window.confirm(t('delConfirm'))){ return; }
+    fb.deleteDoc(fb.doc(fb.db, COLLECTION, id)).catch(function(){
+      setMsg(t('delFail'), 'err');
     });
   }
 
@@ -260,6 +352,14 @@
       body.appendChild(head);
       body.appendChild(p);
       item.appendChild(body);
+      if(isAdmin){
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'cm-del';
+        del.textContent = t('del');
+        del.addEventListener('click', function(){ deleteComment(c.id); });
+        item.appendChild(del);
+      }
       el.list.appendChild(item);
     });
   }
@@ -276,8 +376,8 @@
       n.textContent = a.displayName;
       b.appendChild(n);
       b.addEventListener('click', function(){
+        if(lockedId){ return; }
         selected = a;
-        try{ localStorage.setItem(LS_AGENT, a.uuid); }catch(err){}
         renderSelected();
         togglePicker(false);
       });
@@ -288,6 +388,7 @@
 
   function togglePicker(force){
     var open = typeof force === 'boolean' ? force : !el.picker.classList.contains('open');
+    if(lockedId){ open = false; }
     el.picker.classList.toggle('open', open);
     el.agentBtn.classList.toggle('open', open);
     el.agentBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -302,7 +403,10 @@
   function send(){
     if(busy){ return; }
     var text = el.text.value.trim();
-    if(!selected){ setMsg(t('needAgent'), 'err'); togglePicker(true); return; }
+    if(authFailed || !fb || !currentUser){ setMsg(t('error'), 'err'); return; }
+    if(!isReady()){ return; }
+    var agent = lockedId ? agentsById[lockedId] : selected;
+    if(!agent){ setMsg(t('needAgent'), 'err'); togglePicker(true); return; }
     if(!text){ setMsg(t('needText'), 'err'); return; }
     if(/(https?:\/\/|www\.)/i.test(text)){ setMsg(t('noLinks'), 'err'); return; }
     if(hasBadWord(text)){ setMsg(t('badWords'), 'err'); return; }
@@ -310,16 +414,30 @@
       var last = Number(localStorage.getItem(LS_LAST)) || 0;
       if(Date.now() - last < COOLDOWN_MS){ setMsg(t('wait'), 'err'); return; }
     }catch(err){}
-    if(!fb){ setMsg(t('error'), 'err'); return; }
+    if(!lockedId){
+      if(!window.confirm(t('confirmPick').replace('{n}', agent.displayName))){ return; }
+    }
 
     busy = true;
-    el.send.disabled = true;
     renderStatic();
     setMsg('');
-    fb.addDoc(fb.collection(fb.db, COLLECTION), {
-      agentId: selected.uuid,
-      text: text,
-      createdAt: fb.serverTimestamp()
+
+    var uid = currentUser.uid;
+    var ensureProfile = lockedId
+      ? Promise.resolve()
+      : fb.setDoc(fb.doc(fb.db, USERS, uid), { agentId: agent.uuid, createdAt: fb.serverTimestamp() })
+          .then(function(){
+            lockedId = agent.uuid;
+            syncIdentity();
+          });
+
+    ensureProfile.then(function(){
+      return fb.addDoc(fb.collection(fb.db, COLLECTION), {
+        agentId: lockedId,
+        uid: uid,
+        text: text,
+        createdAt: fb.serverTimestamp()
+      });
     }).then(function(){
       el.text.value = '';
       el.count.textContent = '0/' + MAX_LEN;
@@ -329,7 +447,6 @@
       setMsg(t('error'), 'err');
     }).then(function(){
       busy = false;
-      el.send.disabled = false;
       renderStatic();
     });
   }
@@ -345,41 +462,80 @@
           .sort(function(a, b){ return a.displayName.localeCompare(b.displayName); });
         agentsById = {};
         agents.forEach(function(a){ agentsById[a.uuid] = a; });
-        try{
-          var savedId = localStorage.getItem(LS_AGENT);
-          if(savedId && agentsById[savedId]){ selected = agentsById[savedId]; }
-        }catch(err){}
         renderPicker();
+        syncIdentity();
         renderList();
       })
       .catch(function(){});
   }
 
+  function onUser(user){
+    if(!user){
+      fb.signInAnonymously(fb.auth).catch(function(){
+        authFailed = true;
+        renderStatic();
+      });
+      return;
+    }
+    currentUser = user;
+    isAdmin = !user.isAnonymous;
+    profileLoaded = false;
+    lockedId = null;
+    renderStatic();
+    renderAdmin();
+    renderList();
+    fb.getDoc(fb.doc(fb.db, USERS, user.uid)).then(function(snap){
+      lockedId = snap.exists() ? snap.data().agentId : null;
+      profileLoaded = true;
+      syncIdentity();
+    }).catch(function(){
+      authFailed = true;
+      renderStatic();
+    });
+  }
+
   function loadFirebase(){
     var base = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/';
-    return Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-firestore.js')])
-      .then(function(mods){
-        var app = mods[0].initializeApp(FIREBASE_CONFIG);
-        var f = mods[1];
-        fb = {
-          db: f.getFirestore(app),
-          collection: f.collection,
-          addDoc: f.addDoc,
-          serverTimestamp: f.serverTimestamp
-        };
-        var q = f.query(f.collection(fb.db, COLLECTION), f.orderBy('createdAt', 'desc'), f.limit(50));
-        f.onSnapshot(q, function(snap){
-          lastDocs = snap.docs.map(function(d){
-            var data = d.data({ serverTimestamps: 'estimate' });
-            return { id: d.id, agentId: data.agentId, text: data.text, createdAt: data.createdAt };
-          });
-          listState = 'ready';
-          renderList();
-        }, function(){
-          listState = 'error';
-          renderList();
+    return Promise.all([
+      import(base + 'firebase-app.js'),
+      import(base + 'firebase-auth.js'),
+      import(base + 'firebase-firestore.js')
+    ]).then(function(mods){
+      var app = mods[0].initializeApp(FIREBASE_CONFIG);
+      var a = mods[1];
+      var f = mods[2];
+      fb = {
+        db: f.getFirestore(app),
+        auth: a.getAuth(app),
+        collection: f.collection,
+        doc: f.doc,
+        addDoc: f.addDoc,
+        setDoc: f.setDoc,
+        getDoc: f.getDoc,
+        deleteDoc: f.deleteDoc,
+        serverTimestamp: f.serverTimestamp,
+        signInAnonymously: a.signInAnonymously,
+        signInWithPopup: a.signInWithPopup,
+        GoogleAuthProvider: a.GoogleAuthProvider,
+        signOut: a.signOut
+      };
+
+      var q = f.query(f.collection(fb.db, COLLECTION), f.orderBy('createdAt', 'desc'), f.limit(50));
+      f.onSnapshot(q, function(snap){
+        lastDocs = snap.docs.map(function(d){
+          var data = d.data({ serverTimestamps: 'estimate' });
+          return { id: d.id, agentId: data.agentId, text: data.text, createdAt: data.createdAt };
         });
+        listState = 'ready';
+        renderList();
+      }, function(){
+        listState = 'error';
+        renderList();
       });
+
+      a.onAuthStateChanged(fb.auth, onUser);
+      renderAdmin();
+    });
   }
 
   var started = false;
@@ -389,18 +545,23 @@
     loadAgents();
     loadFirebase().catch(function(){
       listState = 'error';
+      authFailed = true;
       renderList();
+      renderStatic();
     });
   }
 
   renderStatic();
   renderList();
+  renderAdmin();
+  window.addEventListener('hashchange', renderAdmin);
 
   // Re-apply dynamic text when the page language is switched (static text is handled by the page itself).
   if('MutationObserver' in window){
     new MutationObserver(function(){
       renderStatic();
       renderList();
+      renderAdmin();
     }).observe(root, { attributes: true, attributeFilter: ['lang'] });
   }
 
@@ -408,6 +569,9 @@
   section.querySelectorAll('[data-ar]').forEach(function(n){
     n.innerHTML = n.getAttribute('data-' + lg);
   });
+
+  // Opening the page with #admin loads comments right away so the admin can sign in.
+  if(location.hash === '#admin'){ start(); }
 
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
