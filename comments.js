@@ -17,6 +17,8 @@
   var REPLIES = 'replies';
   var USERS = 'users';
   var AGENTS_URL = 'https://valorant-api.com/v1/agents?isPlayableCharacter=true';
+  // Phone notification for new comments (free ntfy.sh topic; subscribe to the same name in the ntfy app).
+  var NTFY_TOPIC = 'valoshop-cm-7k2q9x4m8v1r5w3z';
   var MAX_LEN = 500;
   var MAX_NAME = 30;
   var COOLDOWN_MS = 30000;
@@ -252,6 +254,19 @@
       }
     }
     return false;
+  }
+
+  // ---------- Notifications ----------
+  // Sends a push to the owner's phone (via the free ntfy.sh service) when a visitor posts a comment.
+  function notifyOwner(agentName, text){
+    try{
+      var clean = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+      var url = 'https://ntfy.sh/' + NTFY_TOPIC +
+        '?title=' + encodeURIComponent('Valo Shop — تعليق جديد') +
+        '&tags=speech_balloon' +
+        '&click=' + encodeURIComponent(location.origin + location.pathname + '#admin');
+      fetch(url, { method: 'POST', mode: 'no-cors', body: agentName + ': ' + clean }).catch(function(){});
+    }catch(e){}
   }
 
   // ---------- Helpers ----------
@@ -629,9 +644,13 @@
     ensureProfile.then(function(){
       return fb.addDoc(fb.collection(fb.db, COLLECTION), res.data);
     }).then(function(){
+      var sentText = res.data.text;
       el.text.value = '';
       el.count.textContent = '0/' + MAX_LEN;
-      if(!isAdmin){ try{ localStorage.setItem(LS_LAST, String(Date.now())); }catch(err){} }
+      if(!isAdmin){
+        try{ localStorage.setItem(LS_LAST, String(Date.now())); }catch(err){}
+        notifyOwner(agent.displayName, sentText);
+      }
       setMsg(t('sent'), 'ok');
     }).catch(function(){
       setMsg(t('error'), 'err');
