@@ -35,6 +35,14 @@
       lockedNote: 'الأيجنت ده مربوط بجهازك ومش هتقدر تغيره.',
       unlockedNote: 'اختيارك هيتثبت بعد أول تعليق ومش هتقدر تغيره بعد كده.',
       adminNote: 'بتنشر كمشرف: تقدر تغيّر الأيجنت والاسم في أي وقت.',
+      rateLabel: 'قيّم التطبيق',
+      rateUnlocked: 'التقييم بيتثبت مع أول تعليق ومش هتقدر تغيره بعد كده.',
+      rateLocked: 'تقييمك مربوط بجهازك ومش هتقدر تغيره.',
+      needRating: 'اختار تقييم بالنجوم الأول.',
+      ratingsCount: '{n} تقييم',
+      commentsCount: '{n} تعليق',
+      noRatings: 'لسه مفيش تقييمات',
+      statsTitle: 'تقييمات التطبيق',
       nameLabel: 'الاسم الظاهر (اختياري)',
       namePlaceholder: 'مثلاً: فريق Valo Shop',
       badge: 'مشرف',
@@ -42,7 +50,8 @@
       replyPlaceholder: 'اكتب ردك…',
       replySend: 'ابعت الرد',
       cancel: 'إلغاء',
-      confirmPick: 'هتختار «{n}» ومش هتقدر تغيره بعد كده. متأكد؟',
+      confirmPick: 'هتختار «{n}» وتقييم {r} من 5 ومش هتقدر تغيّرهم بعد كده. متأكد؟',
+      confirmPickNoRate: 'هتختار «{n}» ومش هتقدر تغيره بعد كده. متأكد؟',
       placeholder: 'اكتب تعليقك هنا…',
       send: 'ابعت التعليق',
       sending: 'بيتبعت…',
@@ -72,6 +81,14 @@
       lockedNote: 'This agent is tied to your device and cannot be changed.',
       unlockedNote: 'Your choice is locked after your first comment and cannot be changed later.',
       adminNote: 'Posting as admin: you can change the agent and name any time.',
+      rateLabel: 'Rate the app',
+      rateUnlocked: 'Your rating is locked with your first comment and cannot be changed later.',
+      rateLocked: 'Your rating is tied to your device and cannot be changed.',
+      needRating: 'Pick a star rating first.',
+      ratingsCount: '{n} ratings',
+      commentsCount: '{n} comments',
+      noRatings: 'No ratings yet',
+      statsTitle: 'App ratings',
       nameLabel: 'Display name (optional)',
       namePlaceholder: 'e.g. Valo Shop Team',
       badge: 'Admin',
@@ -79,7 +96,8 @@
       replyPlaceholder: 'Write your reply…',
       replySend: 'Post reply',
       cancel: 'Cancel',
-      confirmPick: 'You are picking "{n}" and will not be able to change it later. Continue?',
+      confirmPick: 'You are picking "{n}" with a {r}/5 rating and will not be able to change them later. Continue?',
+      confirmPickNoRate: 'You are picking "{n}" and will not be able to change it later. Continue?',
       placeholder: 'Write your comment here…',
       send: 'Post comment',
       sending: 'Posting…',
@@ -108,6 +126,17 @@
 
   var css = [
     '#valo-shop-page #comments{ background:var(--bg-2); border-top:1px solid var(--line); }',
+    '#valo-shop-page .cm-stats{ display:flex; gap:32px; align-items:center; flex-wrap:wrap; background:var(--surface); border:1px solid var(--line); padding:22px; margin-bottom:18px; }',
+    '#valo-shop-page .cm-avg{ text-align:center; min-width:120px; }',
+    '#valo-shop-page .cm-avg-num{ font-size:46px; font-weight:900; line-height:1.1; }',
+    '#valo-shop-page .cm-avg-stars{ color:var(--gold); font-size:18px; letter-spacing:2px; margin:4px 0; }',
+    '#valo-shop-page .cm-avg-sub{ color:var(--muted); font-size:13px; }',
+    '#valo-shop-page .cm-bars{ flex:1; min-width:200px; display:flex; flex-direction:column; gap:7px; }',
+    '#valo-shop-page .cm-bar-row{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); }',
+    '#valo-shop-page .cm-bar-label{ width:26px; flex:none; text-align:center; font-weight:700; }',
+    '#valo-shop-page .cm-bar-track{ flex:1; height:8px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden; }',
+    '#valo-shop-page .cm-bar-fill{ height:100%; background:var(--gold); }',
+    '#valo-shop-page .cm-bar-count{ width:34px; flex:none; text-align:end; color:var(--muted-2); }',
     '#valo-shop-page .cm-box{ background:var(--surface); border:1px solid var(--line); padding:22px; }',
     '#valo-shop-page .cm-label{ color:var(--muted); font-size:13.5px; font-weight:700; margin-bottom:10px; display:block; }',
     '#valo-shop-page .cm-agent-btn{ all:unset; box-sizing:border-box; cursor:pointer; display:inline-flex; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--line); padding:8px 16px 8px 12px; transition:border-color .2s ease; }',
@@ -127,6 +156,13 @@
     '#valo-shop-page .cm-agent:hover{ background:var(--surface); }',
     '#valo-shop-page .cm-agent.selected{ border-color:var(--red); background:var(--surface); }',
     '#valo-shop-page .cm-agent span{ font-size:12px; color:var(--muted); font-weight:700; }',
+    '#valo-shop-page .cm-rate{ margin-top:18px; }',
+    '#valo-shop-page .cm-rate .cm-label{ margin-bottom:4px; }',
+    '#valo-shop-page .cm-star-pick{ display:flex; gap:4px; direction:ltr; justify-content:flex-start; }',
+    '#valo-shop-page .cm-star-btn{ all:unset; cursor:pointer; font-size:34px; line-height:1; color:var(--muted-2); padding:2px 3px; transition:color .15s ease, transform .15s ease; }',
+    '#valo-shop-page .cm-star-btn.on{ color:var(--gold); }',
+    '#valo-shop-page .cm-star-btn:hover{ transform:scale(1.12); }',
+    '#valo-shop-page .cm-star-btn[disabled]{ cursor:default; transform:none; }',
     '#valo-shop-page .cm-name-wrap{ display:none; margin-top:16px; }',
     '#valo-shop-page .cm-name-wrap.show{ display:block; }',
     '#valo-shop-page .cm-name-wrap .cm-label{ margin-bottom:6px; }',
@@ -155,6 +191,7 @@
     '#valo-shop-page .cm-body{ min-width:0; flex:1; }',
     '#valo-shop-page .cm-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px; }',
     '#valo-shop-page .cm-name{ font-weight:800; font-size:15px; }',
+    '#valo-shop-page .cm-rating{ color:var(--gold); font-size:14px; letter-spacing:1px; direction:ltr; }',
     '#valo-shop-page .cm-badge{ background:var(--red); color:#0A0C0F; font-size:11px; font-weight:900; padding:0 8px; line-height:1.7; }',
     '#valo-shop-page .cm-time{ color:var(--muted-2); font-size:12.5px; }',
     '#valo-shop-page .cm-content{ color:var(--text); font-size:15px; line-height:1.8; margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }',
@@ -173,8 +210,9 @@
       '<div class="section-head">' +
         '<span class="tag" data-ar="التعليقات" data-en="Comments"></span>' +
         '<h2 data-ar="رأيك يهمنا" data-en="Share your thoughts"></h2>' +
-        '<p data-ar="سيب تعليقك أو سؤالك هنا. اختار أيجنت من فالورانت يمثلك، ومفيش تسجيل." data-en="Leave a comment or question here. Pick a Valorant agent to represent you — no sign-up needed."></p>' +
+        '<p data-ar="قيّم التطبيق وسيب تعليقك أو سؤالك هنا. اختار أيجنت من فالورانت يمثلك، ومفيش تسجيل." data-en="Rate the app and leave a comment or question here. Pick a Valorant agent to represent you — no sign-up needed."></p>' +
       '</div>' +
+      '<div class="cm-stats" id="cm-stats"></div>' +
       '<div class="cm-box">' +
         '<span class="cm-label" id="cm-pick-label"></span>' +
         '<button type="button" class="cm-agent-btn" id="cm-agent-btn" aria-expanded="false">' +
@@ -184,6 +222,11 @@
         '</button>' +
         '<span class="cm-note" id="cm-note"></span>' +
         '<div class="cm-picker" id="cm-picker"><div class="cm-grid" id="cm-grid"></div></div>' +
+        '<div class="cm-rate" id="cm-rate">' +
+          '<span class="cm-label" id="cm-rate-label"></span>' +
+          '<div class="cm-star-pick" id="cm-star-pick"></div>' +
+          '<span class="cm-note" id="cm-rate-note"></span>' +
+        '</div>' +
         '<div class="cm-name-wrap" id="cm-name-wrap">' +
           '<span class="cm-label" id="cm-name-label"></span>' +
           '<input type="text" class="cm-input" id="cm-name-input" maxlength="' + MAX_NAME + '">' +
@@ -202,8 +245,10 @@
 
   function $(id){ return document.getElementById(id); }
   var el = {
+    stats: $('cm-stats'),
     pickLabel: $('cm-pick-label'), agentBtn: $('cm-agent-btn'), agentAvatar: $('cm-agent-avatar'),
     agentName: $('cm-agent-name'), note: $('cm-note'), picker: $('cm-picker'), grid: $('cm-grid'),
+    rate: $('cm-rate'), rateLabel: $('cm-rate-label'), starPick: $('cm-star-pick'), rateNote: $('cm-rate-note'),
     nameWrap: $('cm-name-wrap'), nameLabel: $('cm-name-label'), nameInput: $('cm-name-input'),
     text: $('cm-text'), count: $('cm-count'), msg: $('cm-msg'), send: $('cm-send'),
     admin: $('cm-admin'), list: $('cm-list')
@@ -212,13 +257,17 @@
   var agents = [];
   var agentsById = {};
   var selected = null;
+  var selectedRating = 0;
   var lockedId = null;
+  var profileRating = null;
   var profileLoaded = false;
   var authFailed = false;
   var currentUser = null;
   var isAdmin = false;
   var lastDocs = null;
   var repliesByParent = {};
+  var stats = null;
+  var statsTimer = null;
   var listState = 'loading';
   var busy = false;
   var fb = null;
@@ -258,18 +307,24 @@
 
   // ---------- Notifications ----------
   // Sends a push to the owner's phone (via the free ntfy.sh service) when a visitor posts a comment.
-  function notifyOwner(agentName, text){
+  function notifyOwner(agentName, rating, text){
     try{
       var clean = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+      var stars = rating ? starsText(rating) + ' ' : '';
       var url = 'https://ntfy.sh/' + NTFY_TOPIC +
         '?title=' + encodeURIComponent('Valo Shop — تعليق جديد') +
         '&tags=speech_balloon' +
         '&click=' + encodeURIComponent(location.origin + location.pathname + '#admin');
-      fetch(url, { method: 'POST', mode: 'no-cors', body: agentName + ': ' + clean }).catch(function(){});
+      fetch(url, { method: 'POST', mode: 'no-cors', body: stars + agentName + ': ' + clean }).catch(function(){});
     }catch(e){}
   }
 
   // ---------- Helpers ----------
+  function starsText(n){
+    n = Math.max(0, Math.min(5, Math.round(n || 0)));
+    return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+  }
+
   function makeAvatar(agent){
     var wrap = document.createElement('span');
     wrap.className = 'cm-avatar';
@@ -301,7 +356,119 @@
     }catch(e){ return ''; }
   }
 
+  function fmtNum(n){
+    try{ return Number(n).toLocaleString(t('locale')); }catch(e){ return String(n); }
+  }
+
   function isReady(){ return !!currentUser && profileLoaded; }
+
+  // ---------- Rating widget (the star picker in the form) ----------
+  var starBtns = [];
+  (function buildStarPicker(){
+    for(var i = 1; i <= 5; i++){
+      (function(n){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cm-star-btn';
+        b.textContent = '★';
+        b.setAttribute('aria-label', n + '/5');
+        b.addEventListener('click', function(){
+          if(isAdmin || lockedId){ return; }
+          selectedRating = n;
+          renderRating();
+        });
+        starBtns.push(b);
+        el.starPick.appendChild(b);
+      })(i);
+    }
+  })();
+
+  function renderRating(){
+    // Admin never rates. A returning visitor sees their locked rating (or nothing if their profile has none).
+    var show = !isAdmin && (!lockedId || !!profileRating);
+    el.rate.style.display = show ? 'block' : 'none';
+    el.rateLabel.textContent = t('rateLabel');
+    var val = lockedId ? (profileRating || 0) : selectedRating;
+    starBtns.forEach(function(b, i){
+      b.classList.toggle('on', i < val);
+      b.disabled = !!lockedId;
+    });
+    el.rateNote.textContent = lockedId ? t('rateLocked') : t('rateUnlocked');
+  }
+
+  // ---------- Stats panel (average, distribution, counters) ----------
+  function renderStats(){
+    el.stats.innerHTML = '';
+    var counts = stats ? stats.counts : [0, 0, 0, 0, 0];
+    var total = counts.reduce(function(a, b){ return a + b; }, 0);
+    var sum = counts.reduce(function(a, c, i){ return a + c * (i + 1); }, 0);
+    var avg = total ? sum / total : 0;
+
+    var left = document.createElement('div');
+    left.className = 'cm-avg';
+    var num = document.createElement('div');
+    num.className = 'cm-avg-num';
+    num.textContent = total ? avg.toFixed(1) : '—';
+    var st = document.createElement('div');
+    st.className = 'cm-avg-stars';
+    st.textContent = starsText(avg);
+    var sub = document.createElement('div');
+    sub.className = 'cm-avg-sub';
+    sub.textContent = total ? t('ratingsCount').replace('{n}', fmtNum(total)) : t('noRatings');
+    left.appendChild(num);
+    left.appendChild(st);
+    left.appendChild(sub);
+    if(stats){
+      var cc = document.createElement('div');
+      cc.className = 'cm-avg-sub';
+      cc.textContent = t('commentsCount').replace('{n}', fmtNum(stats.comments));
+      left.appendChild(cc);
+    }
+
+    var bars = document.createElement('div');
+    bars.className = 'cm-bars';
+    for(var n = 5; n >= 1; n--){
+      var c = counts[n - 1];
+      var row = document.createElement('div');
+      row.className = 'cm-bar-row';
+      var lab = document.createElement('span');
+      lab.className = 'cm-bar-label';
+      lab.textContent = n + '★';
+      var track = document.createElement('div');
+      track.className = 'cm-bar-track';
+      var fill = document.createElement('div');
+      fill.className = 'cm-bar-fill';
+      fill.style.width = (total ? Math.round(c / total * 100) : 0) + '%';
+      track.appendChild(fill);
+      var cnt = document.createElement('span');
+      cnt.className = 'cm-bar-count';
+      cnt.textContent = fmtNum(c);
+      row.appendChild(lab);
+      row.appendChild(track);
+      row.appendChild(cnt);
+      bars.appendChild(row);
+    }
+    el.stats.appendChild(left);
+    el.stats.appendChild(bars);
+  }
+
+  // Counts come from the server (one count query per star level + total comments), so they stay exact beyond the 50 shown comments.
+  function refreshStats(){
+    if(!fb){ return; }
+    var jobs = [1, 2, 3, 4, 5].map(function(n){
+      return fb.getCountFromServer(fb.query(fb.collection(fb.db, USERS), fb.where('rating', '==', n)))
+        .then(function(s){ return s.data().count; });
+    });
+    jobs.push(fb.getCountFromServer(fb.collection(fb.db, COLLECTION)).then(function(s){ return s.data().count; }));
+    Promise.all(jobs).then(function(r){
+      stats = { counts: r.slice(0, 5), comments: r[5] };
+      renderStats();
+    }).catch(function(){});
+  }
+  function scheduleStats(){
+    clearTimeout(statsTimer);
+    statsTimer = setTimeout(refreshStats, 700);
+  }
 
   function renderStatic(){
     el.pickLabel.textContent = t('pick');
@@ -315,6 +482,7 @@
     el.send.disabled = busy || (!isReady() && !authFailed);
     el.agentName.textContent = selected ? selected.displayName : t('pickHint');
     el.note.textContent = isAdmin ? t('adminNote') : (lockedId ? t('lockedNote') : t('unlockedNote'));
+    renderRating();
   }
 
   function renderSelected(){
@@ -412,6 +580,12 @@
       badge.className = 'cm-badge';
       badge.textContent = t('badge');
       head.appendChild(badge);
+    }
+    if(c.rating){
+      var rt = document.createElement('span');
+      rt.className = 'cm-rating';
+      rt.textContent = starsText(c.rating);
+      head.appendChild(rt);
     }
     var time = document.createElement('span');
     time.className = 'cm-time';
@@ -590,6 +764,11 @@
     if(!isReady()){ return { err: 'preparing' }; }
     var agent = isAdmin ? selected : (lockedId ? agentsById[lockedId] : selected);
     if(!agent){ return { err: 'needAgent' }; }
+    var rating = 0;
+    if(!isAdmin){
+      rating = lockedId ? (profileRating || 0) : selectedRating;
+      if(!lockedId && !rating){ return { err: 'needRating' }; }
+    }
     if(!text){ return { err: 'needText' }; }
     if(!isAdmin){
       if(/(https?:\/\/|www\.)/i.test(text)){ return { err: 'noLinks' }; }
@@ -609,9 +788,11 @@
       data.admin = true;
       var nm = el.nameInput.value.trim().slice(0, MAX_NAME);
       if(nm){ data.name = nm; }
+    } else if(rating){
+      data.rating = rating;
     }
     if(parentId){ data.parentId = parentId; }
-    return { data: data, agent: agent };
+    return { data: data, agent: agent, rating: rating };
   }
 
   function send(){
@@ -625,7 +806,8 @@
     }
     var agent = res.agent;
     if(!isAdmin && !lockedId){
-      if(!window.confirm(t('confirmPick').replace('{n}', agent.displayName))){ return; }
+      var q = t('confirmPick').replace('{n}', agent.displayName).replace('{r}', String(res.rating));
+      if(!window.confirm(q)){ return; }
     }
 
     busy = true;
@@ -633,13 +815,19 @@
     setMsg('');
 
     var uid = currentUser.uid;
-    var ensureProfile = (isAdmin || lockedId)
+    var creatingProfile = !(isAdmin || lockedId);
+    var ensureProfile = !creatingProfile
       ? Promise.resolve()
-      : fb.setDoc(fb.doc(fb.db, USERS, uid), { agentId: agent.uuid, createdAt: fb.serverTimestamp() })
-          .then(function(){
-            lockedId = agent.uuid;
-            syncIdentity();
-          });
+      : fb.setDoc(fb.doc(fb.db, USERS, uid), (function(){
+          var p = { agentId: agent.uuid, createdAt: fb.serverTimestamp() };
+          if(res.rating){ p.rating = res.rating; }
+          return p;
+        })()).then(function(){
+          lockedId = agent.uuid;
+          profileRating = res.rating || null;
+          syncIdentity();
+          scheduleStats();
+        });
 
     ensureProfile.then(function(){
       return fb.addDoc(fb.collection(fb.db, COLLECTION), res.data);
@@ -649,7 +837,7 @@
       el.count.textContent = '0/' + MAX_LEN;
       if(!isAdmin){
         try{ localStorage.setItem(LS_LAST, String(Date.now())); }catch(err){}
-        notifyOwner(agent.displayName, sentText);
+        notifyOwner(agent.displayName, res.rating, sentText);
       }
       setMsg(t('sent'), 'ok');
     }).catch(function(){
@@ -690,6 +878,7 @@
     isAdmin = !user.isAnonymous;
     profileLoaded = false;
     lockedId = null;
+    profileRating = null;
     if(isAdmin){
       try{ el.nameInput.value = localStorage.getItem(LS_ADMIN_NAME) || ''; }catch(err){}
       profileLoaded = true;
@@ -703,7 +892,14 @@
     renderAdmin();
     renderList();
     fb.getDoc(fb.doc(fb.db, USERS, user.uid)).then(function(snap){
-      lockedId = snap.exists() ? snap.data().agentId : null;
+      if(snap.exists()){
+        var d = snap.data();
+        lockedId = d.agentId || null;
+        profileRating = d.rating || null;
+      } else {
+        lockedId = null;
+        profileRating = null;
+      }
       profileLoaded = true;
       syncIdentity();
     }).catch(function(){
@@ -727,6 +923,9 @@
         auth: a.getAuth(app),
         collection: f.collection,
         doc: f.doc,
+        query: f.query,
+        where: f.where,
+        getCountFromServer: f.getCountFromServer,
         addDoc: f.addDoc,
         setDoc: f.setDoc,
         getDoc: f.getDoc,
@@ -742,10 +941,11 @@
       f.onSnapshot(q, function(snap){
         lastDocs = snap.docs.map(function(d){
           var data = d.data({ serverTimestamps: 'estimate' });
-          return { id: d.id, agentId: data.agentId, name: data.name, admin: !!data.admin, text: data.text, createdAt: data.createdAt };
+          return { id: d.id, agentId: data.agentId, name: data.name, admin: !!data.admin, rating: data.rating, text: data.text, createdAt: data.createdAt };
         });
         listState = 'ready';
         renderListSafe();
+        scheduleStats();
       }, function(){
         listState = 'error';
         renderList();
@@ -767,6 +967,7 @@
 
       a.onAuthStateChanged(fb.auth, onUser);
       renderAdmin();
+      refreshStats();
     });
   }
 
@@ -784,6 +985,7 @@
   }
 
   renderStatic();
+  renderStats();
   renderList();
   renderAdmin();
   window.addEventListener('hashchange', renderAdmin);
@@ -792,6 +994,7 @@
   if('MutationObserver' in window){
     new MutationObserver(function(){
       renderStatic();
+      renderStats();
       renderList();
       renderAdmin();
     }).observe(root, { attributes: true, attributeFilter: ['lang'] });
