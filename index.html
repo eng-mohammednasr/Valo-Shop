@@ -95,6 +95,7 @@
     <p class="lead" data-i="lead"></p>
     <a class="btn btn-primary" data-dl href="https://github.com/eng-mohammednasr/Valo-Shop/releases/latest/download/valoshop.apk" data-i="dl"></a>
     <div class="meta" id="v-meta"></div>
+    <div class="meta" id="h-stats" style="margin-top:2px"></div>
     <a class="rate" id="hero-rate" href="#comments"><span class="gold">★★★★★</span><b id="hr-avg"></b><span id="hr-cnt" style="color:var(--muted)"></span></a>
     <div class="chips"><span class="chip" data-i="t1"></span><span class="chip" data-i="t2"></span><span class="chip" data-i="t3"></span></div>
   </div>
@@ -161,10 +162,10 @@
 
 <script>
 (function(){
-  var root=document.getElementById('valo-shop-page'),LK='valo-shop-lang-choice',OWNER='eng-mohammednasr/Valo-Shop',lang='ar',rels=null,rating=null;
+  var root=document.getElementById('valo-shop-page'),LK='valo-shop-lang-choice',OWNER='eng-mohammednasr/Valo-Shop',lang='ar',rels=null,rating=null,st={d:null,v:null};
   var D={ar:{
     title:'Valo Shop — شوب Valorant من موبايلك',locale:'ar-EG',
-    eyebrow:'تطبيق أندرويد غير رسمي',h1:'شوف شوب <span class="acc">Valorant</span> من موبايلك، من غير ما تفتح اللعبة',lead:'الشوب اليومي، الباندلات، النايت ماركت والرانك. كله في مكان واحد وسريع.',dl:'تحميل APK',meta:'الإصدار {v} · {s}',t1:'مبيطلبش باسورد',t2:'مفتوح المصدر',t3:'مجاني',
+    eyebrow:'تطبيق أندرويد غير رسمي',h1:'شوف شوب <span class="acc">Valorant</span> من موبايلك، من غير ما تفتح اللعبة',lead:'الشوب اليومي، الباندلات، النايت ماركت والرانك. كله في مكان واحد وسريع.',dl:'تحميل APK',meta:'الإصدار {v} · {s}',hd:'تحميل',hv:'زيارة',t1:'مبيطلبش باسورد',t2:'مفتوح المصدر',t3:'مجاني',
     shots_tag:'لقطات من التطبيق',shots_h:'شكل التطبيق من جوه',c1:'الشوب اليومي',c2:'الرانك والرصيد',c3:'سجل الماتشات',c4:'المفضلة',
     f_tag:'المميزات',f_h:'ليه Valo Shop؟',f1h:'الشوب اليومي لحظة بلحظة',f1p:'شوف السكنات من غير ما تفتح اللعبة، وتنبيه لما يظهر سكن مفضل.',f2h:'الباندلات والنايت ماركت',f2p:'العروض والخصومات وتفاصيل الأسعار قبل ما تشتري.',f3h:'تتبع الرانك',f3p:'رتبتك وتقدمك بسهولة.',
     d_tag:'التحميل',d_h:'جاهز تحمّل؟',d_ver:'الإصدار',d_size:'الحجم',d_dls:'عدد التحميلات',d_vis:'زيارات الموقع',d_sha:'بصمة الملف (SHA-256) للتأكد إنه سليم:',d_src:'الكود المصدري على GitHub',d_pp:'لو ظهر تحذير Play Protect فده عادي لأي ملف من خارج جوجل بلاي. متقفلش الحماية، وتأكد إن الملف من الموقع ده وإن البصمة مطابقة.',
@@ -174,7 +175,7 @@
     m_h:'شكرًا إنك حمّلت Valo Shop',m_p:'ممكن تقيّم التطبيق وتكتب تعليقك؟ بياخد دقيقة ويفرق معانا.',m_go:'قيّم واكتب تعليق',m_later:'بعدين',rc:'{n} تقييم'},
   en:{
     title:'Valo Shop — Your Valorant store on your phone',locale:'en-US',
-    eyebrow:'Unofficial Android app',h1:'See your <span class="acc">Valorant</span> store on your phone, without opening the game',lead:'Daily shop, bundles, Night Market and rank. All in one fast place.',dl:'Download APK',meta:'Version {v} · {s}',t1:'No password needed',t2:'Open source',t3:'Free',
+    eyebrow:'Unofficial Android app',h1:'See your <span class="acc">Valorant</span> store on your phone, without opening the game',lead:'Daily shop, bundles, Night Market and rank. All in one fast place.',dl:'Download APK',meta:'Version {v} · {s}',hd:'downloads',hv:'visits',t1:'No password needed',t2:'Open source',t3:'Free',
     shots_tag:'App screenshots',shots_h:'What the app looks like',c1:'Daily Shop',c2:'Rank & Balance',c3:'Match History',c4:'Wishlist',
     f_tag:'Features',f_h:'Why Valo Shop?',f1h:"Today's shop, in real time",f1p:'See skins without opening the game, and get alerted when a wishlist skin appears.',f2h:'Bundles & Night Market',f2p:'Offers, discounts and full pricing before you buy.',f3h:'Rank tracking',f3p:'Your rank and progress at a glance.',
     d_tag:'Download',d_h:'Ready to download?',d_ver:'Version',d_size:'Size',d_dls:'Downloads',d_vis:'Site visits',d_sha:'File fingerprint (SHA-256) to check it is intact:',d_src:'Source code on GitHub',d_pp:'A Play Protect warning is normal for any file from outside Google Play. Do not turn protection off; make sure the file came from this site and the fingerprint matches.',
@@ -186,6 +187,7 @@
   function $(i){return document.getElementById(i)}
   function fmt(n){try{return Number(n).toLocaleString(T('locale'))}catch(e){return n}}
   function mb(b){return (b/1048576).toFixed(1).replace(/\.0$/,'')+' MB'}
+  function hs(){var p=[];if(st.d!=null)p.push('📥 '+fmt(st.d)+' '+T('hd'));if(st.v!=null)p.push('👀 '+fmt(st.v)+' '+T('hv'));$('h-stats').textContent=p.join(' · ')}
 
   function render(){
     var a=rels&&rels[0]&&(rels[0].assets||[]).filter(function(x){return x.name==='valoshop.apk'})[0];
@@ -193,12 +195,14 @@
     $('d-ver').textContent=a?(rels[0].tag_name||'—'):'…';
     $('d-size').textContent=a?mb(a.size):'…';
     $('d-sha').textContent=a?((a.digest||'').replace('sha256:','')||'—'):'…';
-    if(rels){var tot=0;rels.forEach(function(r){(r.assets||[]).forEach(function(x){if(x.name==='valoshop.apk')tot+=x.download_count||0})});$('d-dls').textContent=fmt(tot);
+    if(rels){var tot=0;rels.forEach(function(r){(r.assets||[]).forEach(function(x){if(x.name==='valoshop.apk')tot+=x.download_count||0})});st.d=tot;$('d-dls').textContent=fmt(tot);
       var L=$('old-list');L.innerHTML='';var olds=rels.slice(1).filter(function(r){return (r.assets||[]).some(function(x){return x.name==='valoshop.apk'})});
       if(!olds.length){L.innerHTML='<p class="mut" style="margin:0 0 14px">'+T('oldnone')+'</p>'}
       olds.forEach(function(r){var x=r.assets.filter(function(y){return y.name==='valoshop.apk'})[0],row=document.createElement('div'),s=document.createElement('span'),l=document.createElement('a');row.className='old-row';s.textContent=(r.tag_name||'')+' · '+mb(x.size);l.href=x.browser_download_url;l.textContent=T('get');row.appendChild(s);row.appendChild(l);L.appendChild(row)})}
     var hr=$('hero-rate');
     if(rating&&rating.total){hr.classList.add('show');$('hr-avg').textContent=rating.avg.toFixed(1);$('hr-cnt').textContent='· '+T('rc').replace('{n}',fmt(rating.total))}
+    if(st.v!=null)$('d-vis').textContent=fmt(st.v);
+    hs();
   }
 
   function apply(l,save){
@@ -220,7 +224,7 @@
 
   // Releases (size, version, fingerprint, counters, older versions)
   fetch('https://api.github.com/repos/'+OWNER+'/releases?per_page=100').then(function(r){return r.json()}).then(function(rs){rels=Array.isArray(rs)?rs:[];render()}).catch(function(){});
-  fetch('https://countapi.mileshilliard.com/api/v1/hit/valo-shop-mn-2026-app-visits').then(function(r){return r.json()}).then(function(d){$('d-vis').textContent=fmt(d.value)}).catch(function(){$('d-vis').textContent='—'});
+  fetch('https://countapi.mileshilliard.com/api/v1/hit/valo-shop-mn-2026-app-visits').then(function(r){return r.json()}).then(function(d){st.v=Number(d.value);render()}).catch(function(){$('d-vis').textContent='—'});
 
   // Rating summary for the hero (exact counts straight from Firestore)
   (function(){
